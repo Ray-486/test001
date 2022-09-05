@@ -1,7 +1,14 @@
 package com.rongxing.bean;
 
+
 import java.util.Date;
 
+/**
+ * GoodsInfo 实体类
+ * 添加 toString 方法
+ * @author 廖宇星 Ray
+ * @date 2022-09-05
+ */
 public class GoodsInfo {
     private Long id;
 
@@ -24,6 +31,27 @@ public class GoodsInfo {
     private Date lastupdatetime;
 
     private String createdby;
+
+    public GoodsInfo() {
+    }
+
+    /**
+     * @author 廖宇星 Ray
+     * @date 2022-09-05
+     * @param goodsname
+     * @param marketprice
+     * @param realprice
+     * @param num
+     * @param lastupdatetime
+     */
+    public GoodsInfo(String goodsname, Double marketprice, Double realprice, Integer num, Date lastupdatetime) {
+        this.goodsname = goodsname;
+        this.marketprice = marketprice;
+        this.realprice = realprice;
+        this.num = num;
+        this.lastupdatetime = lastupdatetime;
+    }
+    //    以下为自动生成
 
     public Long getId() {
         return id;
@@ -111,5 +139,22 @@ public class GoodsInfo {
 
     public void setCreatedby(String createdby) {
         this.createdby = createdby == null ? null : createdby.trim();
+    }
+
+    @Override
+    public String toString() {
+        return "GoodsInfo{" +
+                "id=" + id +
+                ", goodssn='" + goodssn + '\'' +
+                ", goodsname='" + goodsname + '\'' +
+                ", marketprice=" + marketprice +
+                ", realprice=" + realprice +
+                ", state=" + state +
+                ", num=" + num +
+                ", unit='" + unit + '\'' +
+                ", createtime=" + createtime +
+                ", lastupdatetime=" + lastupdatetime +
+                ", createdby='" + createdby + '\'' +
+                '}';
     }
 }

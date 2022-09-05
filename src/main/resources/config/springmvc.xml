@@ -10,10 +10,12 @@
            http://www.springframework.org/schema/context/spring-context.xsd">
     <context:annotation-config/>
 
-    <context:component-scan base-package="com.rongxing.controller" />
-    <mvc:annotation-driven />
-    <mvc:view-controller path="/" view-name="登录"></mvc:view-controller>
-    <mvc:default-servlet-handler default-servlet-name="default"/>
+    <context:component-scan base-package="com.rongxing" />
+    <mvc:annotation-driven></mvc:annotation-driven>
+    <!--开放对静态资源访问-->
+    <mvc:default-servlet-handler/>
+
+    <mvc:view-controller path="/" view-name="login"></mvc:view-controller>
     <!--最常用的视图解析器-->
 <!--    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
 <!--        <property name="prefix" value="/WEB-INF/pages/"></property>-->
@@ -43,18 +45,29 @@
     </bean>
 
     <!--静态资源-->
-    <mvc:resources location="/web_page/" mapping="/*"/>
+    <mvc:resources location="/web_page/" mapping="/**"/>
     <!--<mvc:resources location="/csses/" mapping="/**"/>-->
     <!--<mvc:resources location="/htmls/" mapping="/**"/>-->
     <!--<mvc:resources location="/jses/" mapping="/**"/>-->
 
-<!--    <mvc:interceptors>-->
-<!--        <mvc:interceptor>-->
-<!--        <bean class="org.springframework.web.filter.CharacterEncodingFilter">-->
-<!--            <property nam-->
-<!--        </bean>-->
-<!--        </mvc:interceptor>-->
-<!--    </mvc:interceptors>-->
+    <mvc:interceptors>
+<!--&lt;!&ndash;        <mvc:interceptor>&ndash;&gt;-->
+<!--&lt;!&ndash;        <bean class="org.springframework.web.filter.CharacterEncodingFilter">&ndash;&gt;-->
+<!--&lt;!&ndash;            <property nam&ndash;&gt;-->
+<!--&lt;!&ndash;        </bean>&ndash;&gt;-->
+<!--&lt;!&ndash;        </mvc:interceptor>&ndash;&gt;-->
+        <mvc:interceptor>
+            <mvc:mapping path="/*"/>
+            <mvc:exclude-mapping path="/login"/>
+            <mvc:exclude-mapping path="/"/>
+            <mvc:exclude-mapping path="/login.html"/>
+            <bean class="com.rongxing.interceptor.LoginInterceptor"></bean>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/back*"/>
+            <bean class="com.rongxing.interceptor.AuthorityInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
 
     <!--<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">-->
         <!--<property name="formatters">-->

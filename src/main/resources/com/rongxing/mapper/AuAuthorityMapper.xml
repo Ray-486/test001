@@ -103,4 +103,19 @@
       createdBy = #{createdby,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="selectByRoleId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from au_authority
+    where roleId=#{roleId}
+  </select>
+  <delete id="deleteByRoleId">
+    delete from au_authority where roleId=#{roleId}
+  </delete>
+  <select id="selectByRidAndFid" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from au_authority
+    where roleId=#{rid} and functionId=#{fid}
+  </select>
 </mapper>

@@ -2,6 +2,8 @@ package com.rongxing.mapper;
 
 import com.rongxing.bean.AuRole;
 
+import java.util.List;
+
 public interface AuRoleMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -14,4 +16,6 @@ public interface AuRoleMapper {
     int updateByPrimaryKeySelective(AuRole record);
 
     int updateByPrimaryKey(AuRole record);
+
+    List<AuRole> getAllRoles();
 }

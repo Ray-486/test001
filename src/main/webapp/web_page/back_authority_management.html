@@ -1,124 +1,212 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" type="text/css" href="./Style/skin.css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="./Style/skin.css"/>
+    <script type="text/javascript" src="./Js/jquery-3.3.1.min.js"></script>
     <style type="text/css">
-        #role{
+        #role {
             float: left;
-            height: 100px;
-            width: 300px;
-        }
-        #function{
-            float: left;
-            height: 430px;
+            height: 80px;
             width: 100%;
         }
-        .title{
+
+        #function {
+            float: left;
+            height: 500px;
+            width:100%;
+        }
+
+        .title {
             float: left;
             height: 20px;
             width: 100%;
             text-align: left;
+            margin:0px;
+            padding: 0px;
         }
-        .roles{
-            margin-top: 20px;
+
+        .roles {
             float: left;
             height: 20px;
-            width: 40px;
+            width: 100%;
+            margin-top: 20px;
+            margin-left: 10px;
+        }
+
+        .role_select {
+            width: 80px;
+            margin-right: 0px;
+            display: inline-block;
+            border-style: solid;
+            border-width: 1px;
+            text-align: center;
+        }
+
+        .functions {
+            float: left;
+            height: 400px;
+            width: 100%;
+            text-align: left;
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+
+        .function_select {
+            width: 18%;
+            height: 30px;
+            display: inline-block;
+        }
+
+        #authroity {
+            width: 1050px;
+            margin-left: 9px;
+            font-size: 12px;
+            color: #000;
+            border-collapse: collapse;
+            vertical-align: top;
+            background-color: rgb(247, 248, 249);
+            font-family: Arial,"Arial Black","微软雅黑","宋体";
+            border-style: solid;
+            height: 700px;
+        }
+        a:hover{
+            cursor: pointer;
         }
     </style>
+    <script>
+        $(function (){
+            $(".roleName").click(function () {
+                var roleid = $(this).attr("roleID");
+                $("#hidden_rid").val(roleid);
+                $("input:checked").each(function (i) {
+                    $(this).prop("checked",false);
+                });
+                $(".function_check").each(function () {
+                    var checkbox = $(this);
+                    var functionid=$(this).attr("functionid");
+                    $.ajax({
+                        url: 'isExistFunction',
+                        type: 'POST',
+                        data:{rid:roleid,fid:functionid},
+                        dataType: 'html',
+                        success:function (data) {
+                            if(data=="success"){
+                                checkbox.prop("checked",true);
+                            }else{
+                                checkbox.prop("checked",false);
+                            }
+                        }
+                    })
+                });
+            });
+
+            $("#save").click(function (){
+                if(!confirm("是否要修改？")){
+                    return false
+                }else{
+              var roleid=$("#hidden_rid").val();
+              var mdata=roleid;
+              if(roleid==null){
+                  alert("请选择角色！");
+                  return false;
+              }else{
+                $(".function_check:checked").each(function () {
+                    var checkbox=$(this);
+                    mdata=mdata+"-"+checkbox.attr("functionid");
+                });
+              }
+                console.log(mdata);
+              $.ajax({
+                  url: 'modify_function',
+                  type: 'POST',
+                  data:{mdata:mdata},
+                  dataType: 'html',
+                  success:function (data){
+                      alert(data.value());
+                  }
+              });
+                }
+            });
+
+        });
+
+
+    </script>
 </head>
-    <body>
-        <table width="100%" border="0" cellpadding="0" cellspacing="0">
-            <!-- 头部开始 -->
-            <tr>
-                <td width="17" valign="top" background="./Images/mail_left_bg.gif">
-                    <img src="./Images/left_top_right.gif" width="17" height="29" />
-                </td>
-                <td valign="top" background="./Images/content_bg.gif">
-                    
-                </td>
-                <td width="16" valign="top" background="./Images/mail_right_bg.gif"><img src="./Images/nav_right_bg.gif" width="16" height="29" /></td>
-            </tr>
-            <!-- 中间部分开始 -->
-            <tr>
-                <!--第一行左边框-->
-                <td valign="middle" background="./Images/mail_left_bg.gif">&nbsp;</td>
-                <!--第一行中间内容-->
-                <td valign="top" bgcolor="#F7F8F9">
-                    <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
-                        <!-- 空白行-->
-                        <tr><td colspan="2" valign="top">&nbsp;</td><td>&nbsp;</td><td valign="top">&nbsp;</td></tr>
-                        <tr>
-                            <td colspan="4">
-                                <table>
-                                    <tr>
-                                        <td width="100" align="center"><img src="./Images/mime.gif" /></td>
-                                        <td valign="bottom"><h3 style="letter-spacing:1px;"> </h3></td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <!-- 一条线 -->
-                        <tr>
-                            <td height="40" colspan="4">
-                                <table width="100%" height="1" border="0" cellpadding="0" cellspacing="0" bgcolor="#CCCCCC">
-                                    <tr><td></td></tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <!-- 产品列表开始 -->
-                        <!-- 在这里添加内容 -->
-                        <tr>
-                            <td>
-                            <div id="authroity">
-                                <div id="role">
-                                    <div class="title">角色列表</div>
-                                    <div class="roles">
-                                        <div class="role_select" th:each="role : ${roles}">
-                                            <input type="checkbox" checked>
-                                            <span th:text="${role.rolename}"></span>
-                                            <input type="hidden" th:value="${role.rolecode}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="function">
-                                    <div class="title">权限列表</div>
-                                </div>
-                            </div>
-                            </td>
-                        </tr>
-                        <!-- 产品列表结束 -->
-                        <tr>
-                            <td height="40" colspan="4">
-                                <table width="100%" height="1" border="0" cellpadding="0" cellspacing="0" bgcolor="#CCCCCC">
-                                    <tr><td></td></tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="2%">&nbsp;</td>
-                            <td width="51%" class="left_txt">
-                                <img src="./Images/icon_mail.gif" width="16" height="11">客户邮箱slmail@123.com<br />
-                            </td>
-                            <td>&nbsp;</td><td>&nbsp;</td>
-                        </tr>
-                    </table>
-                </td>
-                <td background="./Images/mail_right_bg.gif">&nbsp;</td>
-            </tr>
-            <!-- 底部部分 -->
-            <tr>
-                <td valign="bottom" background="./Images/mail_left_bg.gif">
-                    <img src="./Images/buttom_left.gif" width="17" height="17" />
-                </td>
-                <td background="./Images/buttom_bgs.gif">
-                    <img src="./Images/buttom_bgs.gif" width="17" height="17">
-                </td>
-                <td valign="bottom" background="./Images/mail_right_bg.gif">
-                    <img src="./Images/buttom_right.gif" width="16" height="17" />
-                </td>           
-            </tr>
-        </table>
-    </body>
+<body>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <!-- 头部开始 -->
+    <tr>
+        <td width="17" valign="top" background="./Images/mail_left_bg.gif">
+            <img src="./Images/left_top_right.gif" width="17" height="29"/>
+        </td>
+        <td valign="top" background="./Images/content_bg.gif">
+
+        </td>
+        <td width="16" valign="top" background="./Images/mail_right_bg.gif"><img src="./Images/nav_right_bg.gif"
+                                                                                 width="16" height="29"/></td>
+    </tr>
+    <!-- 中间部分开始 -->
+    <tr>
+        <!--第一行左边框-->
+        <td valign="middle" background="./Images/mail_left_bg.gif">&nbsp;</td>
+        <!--第一行中间内容-->
+        <td valign="top" bgcolor="#F7F8F9">
+            <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+                <!-- 空白行-->
+                <tr>
+                    <td colspan="2" valign="top">&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td valign="top">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <table>
+                            <tr>
+                                <td width="100" align="center"><img src="./Images/mime.gif"/></td>
+                                <td valign="bottom"><h3 style="letter-spacing:1px;">权限管理</h3></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- 一条线 -->
+                <tr>
+                    <td height="40" colspan="4">
+                        <table width="100%" height="1" border="0" cellpadding="0" cellspacing="0" bgcolor="#CCCCCC">
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<!-- 产品列表开始 -->
+<!-- 在这里添加内容 -->
+<div id="authroity">
+    <div id="role">
+        <div class="title">角色列表</div>
+        <div class="roles">
+            <div class="role_select" th:each="role : ${roles}" >
+                <a th:attr="roleID=${role.id}" th:text="${role.rolename}" class="roleName"></a>
+                <input type="hidden" id="hidden_rid">
+            </div>
+        </div>
+    </div>
+    <div id="function">
+        <div class="title">权限列表&nbsp;&nbsp;&nbsp;&nbsp;<button style="height: 15px;font-size: 5px;" id="save">保存</button></div>
+        <div class="functions">
+            <div class="function_select" th:each="function : ${functions}">
+                <input type="checkbox" class="function_check" name="fcheck" th:attr="functionid=${function.id}">
+                <span th:text="${function.functionname}"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
 </html>

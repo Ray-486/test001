@@ -206,4 +206,13 @@
       createdBy = #{createdby,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectGoodsInfoAll" resultType="com.rongxing.bean.GoodsInfo">
+    select * from goods_info order by id
+  </select>
+
+  <insert id="insertGoodsInfo">
+    insert into goods_info(id,goodsName,marketprice,realprice,num,lastupdatetime)
+    values(null ,#{goodsname},#{marketprice},#{realprice},#{num},#{lastupdatetime})
+  </insert>
 </mapper>
