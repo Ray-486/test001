@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <script src="../Js/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+
+<script>
+  $(document).ready(function () {
+    // alert(2);
+    $("#addGoodsInfoMessage").bind("click", function () {
+      var goodsinfo=new Object();
+      goodsinfo.goodsname= $("#goodsname").val();
+
+      // 测试
+      // alert(goodsinfo.goodsname= $("#goodsname").val());
+
+      goodsinfo.marketprice= $("#marketprice").val();
+      goodsinfo.realprice= $("#realprice").val();
+      goodsinfo.num= $("#num").val();
+          $.ajax({
+            url: "/goodsinfo/test486insertGoodsInfo",
+            type: "POST",
+            data: {goodsinfo: JSON.stringify(goodsinfo)},
+            dataType: "text",
+            error: function () {
+              alert("添加失败！");
+            },
+            success: function (result) {
+              if (result != "") {
+                alert("添加成功！");
+              }
+            }
+          });
+
+      });
+  });
+
+</script>
+<!--  <form method="get" action="/goodsinfo/test486insertGoodsInfo">-->
+    商品名称：<input type="text" name="goodsname" id="goodsname"><br>
+    市场价：<input type="text" name="marketprice" id="marketprice"><br>
+    优惠价：<input type="text" name="realprice" id="realprice"><br>
+    库存：<input type="text" name="num" id="num"><br>
+    <label>
+      <input type="radio" name="radio1" checked>上架
+      <input type="radio" name="radio2">下架
+    </label>
+    <button value="提交" id="addGoodsInfoMessage" >提交</button>
+<!--    <input type="submit" value="提交" id="addGoodsInfoMessage"/>-->
+<!--  </form>-->
+<hr>
+
+
+
+
+</body>
+</html>

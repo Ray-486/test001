@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Ray-商品管理-1</title>
+  <link  href="../css/goodsinfo.css" rel="stylesheet">
+
+<!--  <script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>-->
+  <script src="../Js/jquery-3.3.1.min.js"></script>
+
+
+  <script type="text/javascript">
+    $(document).ready(function (){
+      alert(1);
+    })
+  </script>
+<!--  http://localhost:8080/ray/ray001.html  -->
+  <style type="text/css">
+
+  </style>
+</head>
+<body>
+<p><strong>测试css加载 http://localhost:8080/ray/ray001.html
+
+
+</strong></p>
+<hr><p>
+http://localhost:8080/web_page/Js/jquery-3.3.1.min.js</p>
+<hr>
+
+
+  <!--测试成功-->
+
+<div>
+  <a href="../ray/goodsinfo_add.html">新增</a>
+<!--  <form method="get" action="/goodsinfo/test486insertGoodsInfo">-->
+<!--    <input type="submit" value="新增">-->
+<!--  </form>-->
+</div>
+
+
+
+
+    <table  id="main_table" border="1px" cellspacing="0px" style="border-collapse:collapse" bordercolor="skyblue">
+      <caption>商品管理测试</caption>
+      <tr>
+        <th>选择</th>
+        <th cellpadding="180">商品名称</th>
+        <th>市场价（元）</th>
+        <th>优惠价（元）</th>
+        <th>库存</th>
+        <th>状态（上架/下架）</th>
+        <th>最后修改时间</th>
+      </tr>
+      <div th:each="g,gStat:${testselectGoodsInfoAll}">
+        <tr>
+          <td><input type="radio"></td>
+          <td th:text="${g.goodsname}"></td>
+          <td th:text="${g.marketprice}"></td>
+          <td th:text="${g.realprice}"></td>
+          <td th:text="${g.num}"></td>
+          <td><input type="checkbox" name="state" checked></td>
+          <td th:text="${g.lastupdatetime}"></td>
+        </tr>
+      </div>
+
+    </table>
+
+<!--  <span th:text="${gStat.current}"/>-->
+
+
+
+
+
+
+
+
+
+</body>
+</html>
