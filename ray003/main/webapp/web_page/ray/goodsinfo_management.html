@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Ray-商品管理-1</title>
+  <link href="../ray/css/goodsinfo_management.css" rel="stylesheet">
+<!--  <script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>-->
+  <script src="../Js/jquery-3.3.1.min.js"></script>
+  <script src="../ray/js/goods.js"></script>
+
+
+  <style type="text/css">
+
+  </style>
+
+  <script type="text/javascript" th:inline="javascript">
+
+
+    $(document).ready(function (){
+      // 初始化界面
+      myinit();
+
+      // 设置商品id
+      var myid=null;
+      // 单选按钮下标
+      var myindex=null;
+
+      // 添加 页面跳转 到添加页面
+      $("#add").bind("click",function (){
+        window.location="/goodsinfo/goodsinfo_add";
+      })
+
+      // 获取选中的信息-单选框
+      $('[type="radio"]').bind("click",function (){
+        // alert('测试'); style="display: block"
+        // 获取当前选择的按钮下标
+        myindex=$("[name='choose']").index(this);
+        // 获取当前选中的商品id
+        myid =$(this).closest('tr').find('td').eq(7).text();
+        // 获取当前选中商品的商品名
+        myname=$(this).closest('tr').find('td').eq(1).text();
+      });
+
+      // 状态直接更新的方法
+      $('#main_table [type="checkbox"]').bind("click",function () {
+        // 定义一个新的对象
+        var goodsinfo=new Object();
+        // 给对象属性赋值
+        goodsinfo.id=$(this).closest('tr').find('td').eq(7).text();
+        if($(this).is(":checked")){
+          //选中
+          goodsinfo.state=1;
+        }else {
+          // 取消选中;
+          goodsinfo.state=2;
+        }
+
+        // ajax请求后端更新方法
+        $.ajax({
+          url: "/goodsinfo/updateGoodsInfo",
+          type: "POST",
+          data: {goodsinfo: JSON.stringify(goodsinfo)},
+          dataType: "text",
+          error: function () {
+            alert("修改失败-服务器！");
+          },
+          success: function (result) {
+            if (result) {
+              // alert("修改成功！");
+              window.location="/goodsinfo/test486";
+            }else {
+              alert("修改失败-客户端！");
+            }
+          }
+        });
+      });
+
+      // 进入修改界面
+      $("[id=upd]").bind("click",function (){
+        // 修改
+        var myidNum=parseInt(myid);
+        if(myidNum>-1){
+          alert("修改本页第"+(myindex+1)+"个商品"+"\n"+"商品名："+myname);
+          // 把商品id传后端
+          var temp={'id':myid};
+          $.ajax({
+            url: "/goodsinfo/selectByPrimaryKey",
+            type: "post",
+            // 最好是通过字符串转换JSON方法转一下，不然会报莫名其妙的错
+            data:JSON.stringify(temp),
+            contentType:"application/json",
+            // dataType: "text",
+            error: function () {
+              alert("查找失败-服务器！");
+            },
+            success: function (result) {
+              if (result!=null) {
+                // alert("查找修改值成功！");
+                // 修改完后重新请求服务器刷新页面
+                window.location="/goodsinfo/updatetemp";
+              }else {
+                alert("修改失败-客户端！");
+              }
+            }
+          });
+        }else {
+          alert("未选中修改的商品")
+        }
+      });
+
+      // 修改的关闭按钮
+      $("#close1").bind("click",function (){
+        toGoodsInfoIndex();
+      });
+
+      // 验证商品编号是否唯一
+      $('#goodsSN').bind("blur",function (){
+        ifGoodsSNOnly($("[name='goodsSN']").val());
+      })
+
+      // 修改保存
+      $("#save1").bind("click", function () {
+        var flag=ifGoodsSNOnly($("[name='goodsSN']").val());
+        // 判断是否商品编号唯一
+        if (flag==false){
+          // 唯一可以修改商品
+          update_save();
+        }else if (flag==true){
+          // 不唯一不能添加商品，不能修改，弹出提示
+          alert("商品编号已存在，不能修改")
+        }
+      });
+
+      // 删除商品
+      $("[id=det]").bind("click",function (){
+        var myidNum=parseInt(myid);
+        if(myidNum>-1){
+          var detflag=confirm("确认删除本页第"+(myindex+1)+"个商品"+"\n"+"商品名："+myname+'\n'+"点击取消返回");
+          if (detflag==true){
+            var temp={'id':myid};
+            $.ajax({
+              url: "/goodsinfo/deleteByPrimaryKey",
+              type: "post",
+              // 最好是通过字符串转换JSON方法转一下，不然会报莫名其妙的错
+              data:JSON.stringify(temp),
+              contentType:"application/json",
+              // dataType: "text",
+              error: function () {
+                alert("删除失败-服务器！");
+              },
+              success: function (result) {
+                if (result!=null) {
+                  alert("删除成功！");
+                  window.location="/goodsinfo/test486";
+                }else {
+                  alert("删除失败-客户端！");
+                }
+              }
+            });
+          }else {
+            alert("已取消删除商品名："+myname)
+          }
+        }else {
+          alert("还未选中要删除的商品")
+        }
+      });
+
+      // 页面跳转 查看的方法
+      $("[id=show]").bind("click",function (){
+        // 修改
+        var myidNum = parseInt(myid);
+        if (myidNum > -1) {
+          alert("查看页第" + (myindex + 1) + "个商品"+"\n"+"商品名："+myname);
+          // 把商品id传后端
+          var temp = {'id': myid};
+          $.ajax({
+            url: "/goodsinfo/selectByPrimaryKey",
+            type: "post",
+            // 最好是通过字符串转换JSON方法转一下，不然会报莫名其妙的错
+            data:JSON.stringify(temp),
+            contentType:"application/json",
+            // dataType: "text",
+            error: function () {
+              alert("查找失败-服务器！");
+            },
+            success: function (result) {
+              if (result!=null) {
+                // alert("查找成功！");
+                // 修改完后重新请求服务器刷新页面
+                window.location="/goodsinfo/showtemp";
+              }else {
+                alert("查找失败-客户端！");
+              }
+            }
+          });
+        } else {
+          alert("未选中要查看的商品")
+        }
+      });
+
+
+      // 查询功能
+      $("[id=sel]").bind("click",function (){
+        myselect();
+      });
+
+
+    // ready的括号，别删
+    })
+
+
+  </script>
+
+</head>
+
+<body>
+<p th:text="${session.flagupd}" id="getflagupd" style="display:none">判断是否是修改【永远隐藏】</p>
+
+  <!--测试成功-->
+  <div id="goodsmanager">
+    <div class="div1">
+      <p style="float:left;margin-left:50%;">商品管理</p>
+    </div>
+    <div class="div2">
+      <button id="add">新增</button>
+      <button id="upd">修改</button>
+      <button id="det">删除</button>
+      <button id="show">查看</button>
+      <input id="sel_message" type="text" placeholder="请输入关键字" style="margin-left:90px;">
+      <button id="sel">查询</button>
+    </div>
+
+
+    <br>
+
+    <table  id="main_table" border="1px" cellspacing="0px" style="border-collapse:collapse" bordercolor="skyblue">
+      <caption>商品管理测试</caption>
+      <tr>
+        <th>选择</th>
+        <th cellpadding="180">商品名称</th>
+        <th>市场价（元）</th>
+        <th>优惠价（元）</th>
+        <th>库存</th>
+        <th>状态（上架/下架）</th>
+        <th>最后修改时间</th>
+        <th style="display: none">id</th>
+      </tr>
+
+        <div th:if="${session.flagsel} eq false ">
+          <div th:each="g,gStat:${testselectGoodsInfoAll}">
+            <tr>
+              <td><input type="radio" name="choose"></td>
+              <td th:text="${g.goodsname}"></td>
+              <td th:text="${g.marketprice}"></td>
+              <td th:text="${g.realprice}"></td>
+              <td th:text="${g.num}"></td>
+              <td th:switch="${g.state}">
+                <input th:case="1" type="checkbox" name="state" checked>
+                <input th:case="2" type="checkbox" name="state">
+              </td>
+              <td th:text="${g.lastupdatetime}"></td>
+              <td th:text="${g.id}" style="display: none"></td>
+            </tr>
+          </div>
+        </div>
+
+        <div th:if="${session.flagsel} eq true">
+          <div th:each="g,gStat:${session.selectGoodsInfobyGoodsName}">
+            <tr>
+              <td><input type="radio" name="choose"></td>
+              <td th:text="${g.goodsname}"></td>
+              <td th:text="${g.marketprice}"></td>
+              <td th:text="${g.realprice}"></td>
+              <td th:text="${g.num}"></td>
+              <td th:switch="${g.state}">
+                <input th:case="1" type="checkbox" name="state" checked>
+                <input th:case="2" type="checkbox" name="state">
+              </td>
+              <td th:text="${g.lastupdatetime}"></td>
+              <td th:text="${g.id}" style="display: none"></td>
+            </tr>
+          </div>
+        </div>
+
+
+
+    </table>
+
+  <!--  <span th:text="${gStat.current}"/>-->
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!--商品修改-->
+  <div id="goodsinfo_upd" style="display: none">
+    <span style="font-size: 14px;color:black">修改商品</span>
+    <br>
+      <table>
+        <tr>
+          <td>商品名称：</td>
+          <td>
+            <input type="text" name="goodsName" th:value="${session.selectByPrimaryKeyGoodsInfo?.goodsname}">
+            <span>*</span>
+          </td>
+        </tr>
+        <tr>
+          <td>商品编号：</td>
+          <td>
+            <input type="text" name="goodsSN" id="goodsSN" th:value="${session.selectByPrimaryKeyGoodsInfo?.goodssn}">
+            <span id="goodsSN_msg" style="color:red;">* 注：验证编码唯一性</span>
+          </td>
+        </tr>
+        <tr>
+          <td >市场价：</td>
+          <td>
+            <input type="text" name="marketPrice" th:value="${session.selectByPrimaryKeyGoodsInfo?.marketprice}">
+            <span>*</span>
+          </td>
+        </tr>
+        <tr>
+          <td>优惠价：</td>
+          <td>
+            <input type="text" name="realPrice" th:value="${session.selectByPrimaryKeyGoodsInfo?.realprice}">
+            <span>*</span>
+          </td>
+        </tr>
+        <tr>
+          <td>库存：</td>
+          <td>
+            <input type="text" name="num" th:value="${session.selectByPrimaryKeyGoodsInfo?.num}">
+            <span>*</span>
+          </td>
+        </tr>
+        <tr>
+          <td>单位：</td>
+          <td>
+            <input type="text" name="unit" th:value="${session.selectByPrimaryKeyGoodsInfo?.unit}">
+            <span>*</span>
+          </td>
+        </tr>
+        <tr>
+          <td>状态：</td>
+          <td>
+            <div th:if="${session.selectByPrimaryKeyGoodsInfo?.state} eq 1">
+              <input id="state100" type="radio" name="state" checked="checked" value="上架">上架
+              <input id="state200" type="radio" name="state" value="下架">下架
+            </div>
+            <div th:if="${session.selectByPrimaryKeyGoodsInfo?.state} eq 2">
+              <input id="state300" type="radio" name="state" value="上架">上架
+              <input id="state400" type="radio" name="state" checked="checked" value="下架">下架
+            </div>
+
+
+            <!--          <td th:switch="${session.selectByPrimaryKeyGoodsInfo?.state}">-->
+<!--            <input th:case="1" type="checkbox" name="state1" checked="checked" value="上架">上架-->
+<!--            <input th:case="2" type="checkbox" name="state2" checked="checked" value="下架">下架-->
+
+
+          </td>
+          <td>
+            <p th:text="${session.selectByPrimaryKeyGoodsInfo?.state}" name="state3" style="display: none">
+          </td>
+        </tr>
+        <tr>
+          <td>商品规格：</td>
+          <td>
+            <textarea cols="50" rows="5" name="goodsFormat" th:text="${session.selectByPrimaryKeyGoodsInfo?.goodsformat}"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td>商品说明：</td>
+          <td>
+            <textarea cols="50" rows="5" name="note" th:text="${session.selectByPrimaryKeyGoodsInfo?.note}"></textarea>
+          </td>
+        </tr>
+        <tr style="display: none">
+          <td><p name="id1" th:text="${session.selectByPrimaryKeyGoodsInfo?.id}"></p>
+        </tr>
+
+      </table>
+      <div style="margin:30px 0 0 100px">
+        <button id="save1">保存修改</button>
+        <button id="close1" style="margin-left:100px">返回</button>
+      </div>
+  </div>
+
+
+
+
+</body>
+</html>

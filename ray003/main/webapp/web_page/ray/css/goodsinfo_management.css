@@ -1,0 +1,38 @@
+
+*{
+    margin: 0;
+    padding: 0;
+}
+#main_table th{
+    font-family: 微软雅黑;
+    font-size: 14px;
+    font-weight: bold;
+    /*border-bottom:1px dashed #CCCCCC;*/
+    background-color:rgb(235,250,255);
+    color: black;
+    text-align: center;
+    padding: 20px;
+
+}
+#main_table td{
+    padding: 5px;
+    font-family: 微软雅黑;
+    font-size: 14px;
+    text-align: center;
+    color: black;
+}
+
+
+.div1{
+    width:640px;
+    height:50px;
+    font-size: 28px;
+}
+.div2{
+    width:640px;
+    height:50px;
+    font-size: 14px;
+}
+#goodsinfo_upd span{
+    color: red;
+}

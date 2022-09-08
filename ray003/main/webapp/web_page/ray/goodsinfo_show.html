@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ray-商品查看页面</title>
+  <link  href="../ray/css/goodsinfo_show.css" rel="stylesheet">
+
+  <!--  <script src="${pageContext.request.contextPath}/js/jquery-3.6.0.min.js"></script>-->
+  <script src="../Js/jquery-3.3.1.min.js"></script>
+  <script src="../ray/js/goods.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function (){
+        // 单选框设置切换效果
+        radioFunction();
+
+      // 修改关闭
+      $("#close1").bind("click",function (){
+        // 请求服务器回到商品管理主页面
+        toGoodsInfoIndex();
+      });
+    })
+
+  </script>
+</head>
+<body>
+  <div id="goods_show">
+    <span style="font-size: 14px;color:black">查看商品</span>
+
+    <hr/>
+    <table>
+      <tr>
+        <td>商品名称：</td>
+        <td>
+          <span name="goodsName" th:text="${session.selectByPrimaryKeyGoodsInfo?.goodsname}">静态页面测试值</span>
+<!--          <input type="text" name="goodsName" th:value="${session.selectByPrimaryKeyGoodsInfo?.goodsname}">-->
+        </td>
+      </tr>
+      <tr>
+        <td>商品编号：</td>
+        <td>
+          <span name="goodsSN" th:text="${session.selectByPrimaryKeyGoodsInfo?.goodssn}">静态页面测试值</span>
+<!--          <input type="text" name="goodsSN" th:value="${session.selectByPrimaryKeyGoodsInfo?.goodssn}">-->
+<!--          <span name="msg" style="color:red;display:none;"></span>-->
+<!--          <span>* 注：验证编码唯一性</span>-->
+        </td>
+      </tr>
+      <tr>
+        <td >市场价：</td>
+        <td>
+          <span name="marketPrice" th:text="${session.selectByPrimaryKeyGoodsInfo?.marketprice}">静态页面测试值</span>
+<!--          <input type="text" name="marketPrice" th:value="${session.selectByPrimaryKeyGoodsInfo?.marketprice}">-->
+          <span>*</span>
+        </td>
+      </tr>
+      <tr>
+        <td>优惠价：</td>
+        <td>
+          <span name="realPrice" th:text="${session.selectByPrimaryKeyGoodsInfo?.realprice}">静态页面测试值</span>
+<!--          <input type="text" name="realPrice" th:value="${session.selectByPrimaryKeyGoodsInfo?.realprice}">-->
+        </td>
+      </tr>
+      <tr>
+        <td>库存：</td>
+        <td>
+          <span name="num" th:text="${session.selectByPrimaryKeyGoodsInfo?.num}">静态页面测试值</span>
+<!--          <input type="text" name="num" th:value="${session.selectByPrimaryKeyGoodsInfo?.num}">-->
+        </td>
+
+      </tr>
+      <tr>
+        <td>单位：</td>
+        <td>
+          <span name="unit" th:text="${session.selectByPrimaryKeyGoodsInfo?.unit}">静态页面测试值</span>
+<!--          <input type="text" name="unit" th:value="${session.selectByPrimaryKeyGoodsInfo?.unit}">-->
+        </td>
+      </tr>
+      <tr>
+        <td>状态：</td>
+          <td>
+              <div th:if="${session.selectByPrimaryKeyGoodsInfo?.state} eq 1">
+                  <input id="state100" type="radio" name="state" checked="checked" value="上架" onclick="return false;">上架
+                  <input id="state200" type="radio" name="state" value="下架" onclick="return false;">下架
+              </div>
+              <div th:if="${session.selectByPrimaryKeyGoodsInfo?.state} eq 2">
+                  <input id="state300" type="radio" name="state" value="上架" onclick="return false;">上架
+                  <input id="state400" type="radio" name="state" checked="checked" value="下架" onclick="return false;">下架
+              </div>
+
+<!--        <td th:switch="${session.selectByPrimaryKeyGoodsInfo?.state}">-->
+<!--          <input th:case="1" type="checkbox" name="state1" checked="checked" value="上架" onclick="return false;">上架-->
+<!--          <input th:case="2" type="checkbox" name="state2" checked="checked" value="下架" onclick="return false;">下架-->
+
+
+<!--          <input th:case="1" type="radio" name="state1" checked="checked" value="上架" onclick="return false;">上架-->
+<!--          <input th:case="2" type="radio" name="state2" checked="checked" value="下架" onclick="return false;">下架-->
+
+        </td>
+        <td>
+          <span name="state3" th:text="${session.selectByPrimaryKeyGoodsInfo?.state}" style="display: none">静态页面测试值</span>
+<!--          <p th:text="${session.selectByPrimaryKeyGoodsInfo?.state}" name="state3" style="display: none">-->
+        </td>
+      </tr>
+      <tr>
+        <td>商品规格：</td>
+        <td>
+          <textarea cols="50" rows="5" name="goodsFormat" th:text="${session.selectByPrimaryKeyGoodsInfo?.goodsformat}" readonly></textarea>
+          <!--                    <textarea cols="50" rows="5" name="goodsFormat"></textarea>-->
+
+
+        </td>
+      </tr>
+      <tr>
+        <td>商品说明：</td>
+        <td>
+          <textarea cols="50" rows="5" name="note" th:text="${session.selectByPrimaryKeyGoodsInfo?.note}" readonly></textarea>
+          <!--                    <textarea cols="50" rows="5" name="note"></textarea>-->
+        </td>
+      </tr>
+      <tr style="display: none">
+        <td><p name="id1" th:text="${session.selectByPrimaryKeyGoodsInfo?.id}"></p>
+      </tr>
+
+    </table>
+    <div style="margin:30px 0 0 100px">
+<!--      <button id="save1">保存修改</button>-->
+      <button id="close1" style="margin-left:100px">返回</button>
+    </div>
+  </div>
+</body>
+</html>
