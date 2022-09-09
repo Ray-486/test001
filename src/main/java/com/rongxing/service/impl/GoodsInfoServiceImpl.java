@@ -2,6 +2,7 @@ package com.rongxing.service.impl;
 
 import com.rongxing.bean.GoodsInfo;
 
+import com.rongxing.bean.GoodsInfoWithBLOBs;
 import com.rongxing.mapper.GoodsInfoMapper;
 import com.rongxing.service.GoodsInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,26 +31,77 @@ public class GoodsInfoServiceImpl implements GoodsInfoService {
      * @date 2022-09-05
      */
     @Override
-    public List<GoodsInfo> selectGoodsInfoAll() {
-        List<GoodsInfo> list=goodsInfoMapper.selectGoodsInfoAll();
-        return list;
-    }
+    public List<GoodsInfo> selectGoodsInfoAll() { List<GoodsInfo> list=goodsInfoMapper.selectGoodsInfoAll();return list; }
 
     /**
      * 增加商品的方法
      * @author 廖宇星 Ray
      * @date 2022-09-05
-     * @param goodsname 商品名称
-     * @param marketprice 市场价
-     * @param realprice 优惠价
-     * @param num 库存
-     * @param lastupdatetime 最后修改时间
-     * @return 是否添加成功
+     * @param record
+     * @return
      */
     @Override
-    public boolean insertGoodsInfo(String goodsname, Double marketprice, Double realprice, Integer num, Date lastupdatetime) {
-        return goodsInfoMapper.insertGoodsInfo(goodsname, marketprice, realprice,  num,  lastupdatetime);
+    public int insertGoodsInfo(GoodsInfoWithBLOBs record){
+        return goodsInfoMapper.insertGoodsInfo(record);
     }
 
+    /**
+     * 方法-通过id查找商品
+     * @author 廖宇星 Ray
+     * @date 2022-09-06
+     * @param id
+     * @return
+     */
+    @Override
+    public GoodsInfoWithBLOBs selectByPrimaryKey(Long id) { return goodsInfoMapper.selectByPrimaryKey(id); }
+
+    /**
+     * 方法-修改商品
+     * @author 廖宇星 Ray
+     * @date 2022-09-06
+     * @param goodsInfo
+     * @return
+     */
+    @Override
+    public int updateGoodsInfo(GoodsInfoWithBLOBs goodsInfo){ return goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo); }
+
+
+    /**
+     * 方法-删除商品
+     * @author 廖宇星 Ray
+     * @date 2022-09-06
+     * @param id
+     * @return
+     */
+    @Override
+    public int deleteByPrimaryKey(Long id){ return goodsInfoMapper.deleteByPrimaryKey(id); }
+
+    /**
+     * 按商品名查询商品的方法
+     * @return 返回GoodsInfo类
+     * @author 廖宇星 Ray
+     * @date 2022-09-07
+     */
+    @Override
+    public List<GoodsInfo> selectGoodsInfobyGoodsName(String selectmessage) { return goodsInfoMapper.selectGoodsInfobyGoodsName(selectmessage); }
+
+    /**
+     * 分页显示商品方法
+     * @return 返回GoodsInfo类
+     * @author 廖宇星 Ray
+     * @date 2022-09-05
+     */
+    public List<GoodsInfo> getGoodsInfoByPage(Integer pageNum){
+        return goodsInfoMapper.getGoodsInfoByPage(pageNum);
+    }
+
+    /**
+     * 证商品编号是否唯一
+     * @param goodsSN
+     * @return 商品编号相同的个数
+     * @author 廖宇星 Ray
+     * @date 2022-09-07
+     */
+    public Integer selectGoodsCountByGoodsSN(String goodsSN){ return goodsInfoMapper.selectGoodsCountByGoodsSN(goodsSN); }
 
 }

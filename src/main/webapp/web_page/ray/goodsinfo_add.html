@@ -1,59 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-  <script src="../Js/jquery-3.3.1.min.js"></script>
+    <title>Ray-添加商品-1</title>
+    <link  href="../ray/css/goodsinfo_add.css" rel="stylesheet">
+
+    <script src="../Js/jquery-3.3.1.min.js"></script>
+    <script src="../ray/js/goods.js"></script>
+    <style type="text/css">
+
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // 关闭按钮 返回商品管理首页
+            $("#close1").bind("click",function (){
+                toGoodsInfoIndex();
+            });
+
+            // 商品是否唯一
+            var flagifGoodsSNOnly;
+            // 验证商品编号是否唯一
+            $('#goodsSN').bind("blur",function (){
+                flagifGoodsSNOnly=ifGoodsSNOnly($("[name='goodsSN']").val());
+            })
+
+            // 保存按钮功能
+            $("#save1").bind("click", function () {
+                // 判断是否商品编号唯一
+                if (flagifGoodsSNOnly==false){
+                    // 唯一可以添加商品
+                    add_save();
+                }else if (flagifGoodsSNOnly==true){
+                    // 不唯一不能添加商品，不能保存，弹出提示
+                    alert("商品编号已存在，不能添加")
+                }
+            });
+        });
+
+    </script>
 </head>
 <body>
 
-<script>
-  $(document).ready(function () {
-    // alert(2);
-    $("#addGoodsInfoMessage").bind("click", function () {
-      var goodsinfo=new Object();
-      goodsinfo.goodsname= $("#goodsname").val();
+<p th:text="${flagGoodsSNOnly}" id="getflagGoodsSNOnly" style="display:none">判断是否是商品编号重复【永远隐藏】</p>
 
-      // 测试
-      // alert(goodsinfo.goodsname= $("#goodsname").val());
+    <div id="goods_add">
+        <div class="div11">
+            <span style="color:black">新增商品</span>
+        </div>
+        <hr/>
+        <br>
+        <div class="div22">
+            <table>
+                <tr>
+                    <td>商品名称：</td>
+                    <td>
+                        <input type="text" name="goodsName" >
+                        <span>*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>商品编号：</td>
+                    <td>
+                        <input type="text"  name="goodsSN" id="goodsSN">
+                        <span id="goodsSN_msg" style="color:red;">* 注：验证编码唯一性</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td >市场价：</td>
+                    <td>
+                        <input type="text" name="marketPrice">
+                        <span>*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>优惠价：</td>
+                    <td>
+                        <input type="text" name="realPrice">
+                        <span>*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>库存：</td>
+                    <td>
+                        <input type="text" name="num">
+                        <span>*</span>
+                    </td>
 
-      goodsinfo.marketprice= $("#marketprice").val();
-      goodsinfo.realprice= $("#realprice").val();
-      goodsinfo.num= $("#num").val();
-          $.ajax({
-            url: "/goodsinfo/test486insertGoodsInfo",
-            type: "POST",
-            data: {goodsinfo: JSON.stringify(goodsinfo)},
-            dataType: "text",
-            error: function () {
-              alert("添加失败！");
-            },
-            success: function (result) {
-              if (result != "") {
-                alert("添加成功！");
-              }
-            }
-          });
-
-      });
-  });
-
-</script>
-<!--  <form method="get" action="/goodsinfo/test486insertGoodsInfo">-->
-    商品名称：<input type="text" name="goodsname" id="goodsname"><br>
-    市场价：<input type="text" name="marketprice" id="marketprice"><br>
-    优惠价：<input type="text" name="realprice" id="realprice"><br>
-    库存：<input type="text" name="num" id="num"><br>
-    <label>
-      <input type="radio" name="radio1" checked>上架
-      <input type="radio" name="radio2">下架
-    </label>
-    <button value="提交" id="addGoodsInfoMessage" >提交</button>
-<!--    <input type="submit" value="提交" id="addGoodsInfoMessage"/>-->
-<!--  </form>-->
-<hr>
-
-
+                </tr>
+                <tr>
+                    <td>单位：</td>
+                    <td>
+                        <input type="text" name="unit">
+                        <span>*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>状态：</td>
+                    <td>
+                        <input type="radio" name="state" checked="checked" value="上架">上架
+                        <input type="radio" name="state" value="下架">下架
+                    </td>
+                </tr>
+                <tr>
+                    <td>商品规格：</td>
+                    <td>
+                        <textarea cols="50" rows="5" name="goodsFormat"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>商品说明：</td>
+                    <td>
+                        <textarea cols="50" rows="5" name="note"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="div33">
+            <button id="save1">保存</button>
+            <button id="close1" style="margin-left:100px">返回</button>
+        </div>
+    </div>
 
 
 </body>

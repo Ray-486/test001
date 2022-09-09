@@ -27,9 +27,11 @@ public class MyController {
         AuUser user = auUserService.login(loginCode, password);
         //判断是否存在
         if(user!=null){
+            session.removeAttribute("login_msg");
             session.setAttribute("auUser",user);
             return "redirect:/index";
         }else{
+            session.setAttribute("login_msg","登录失败");
             return "redirect:/";
         }
 

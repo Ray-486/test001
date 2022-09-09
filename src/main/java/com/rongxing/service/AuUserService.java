@@ -28,10 +28,6 @@ public class AuUserService {
         return auUserMapper.findAll(username);
     }
 
-    public int insert(AuUser auUser) {
-        return auUserMapper.insert(auUser);
-    }
-
     public List<AuUser> listUser() {
         return auUserMapper.listUser();
     }
@@ -51,11 +47,11 @@ public class AuUserService {
     }
 
     public AuUser queryUserById(Integer id) {
-        return auUserMapper.queryUserById(id);
+        return (auUserMapper.queryUserById(id));
     }
 
-    public boolean updateUser(AuUser user) {
-        int i = auUserMapper.updateUser(user);
+    public boolean updateByPrimaryKey(AuUser user) {
+        int i = auUserMapper.updateByPrimaryKey(user);
         if(i > 0){
             return true;
         }else {
@@ -63,11 +59,16 @@ public class AuUserService {
         }
     }
 
-    public boolean addUser(AuUser user) {
-        return auUserMapper.addUser(user) > 0 ? true : false ;
+    public boolean insert(AuUser user) {
+        return auUserMapper.insert(user) > 0;
     }
 
-    public int selectUserByName(String name) {
-        return auUserMapper.selectUserByName(name);
+    public int selectUserByName(String username) {
+        return auUserMapper.selectUserByName(username);
     }
+
+    public int updateStatusByUid(Integer isStart,Long uid){
+        return auUserMapper.updateisStartByUid(isStart,uid);
+    }
+
 }

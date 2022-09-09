@@ -428,9 +428,7 @@
     delete from au_user where id=#{id}
   </delete>
 
-  <update id="updateUser">
 
-  </update>
   <insert id="addUser">
     insert into au_user(id, loginCode,userName) values (#{id},#{logincode},#{username})
   </insert>
@@ -439,4 +437,8 @@
     select count(id) from au_user
     where  userName=#{name}
   </select>
+
+  <update id="updateisStartByUid">
+    update au_user set isStart=#{isStart} where id=#{uid}
+  </update>
 </mapper>

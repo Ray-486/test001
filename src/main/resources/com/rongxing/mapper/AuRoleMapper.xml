@@ -5,7 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="roleCode" property="rolecode" jdbcType="VARCHAR" />
     <result column="roleName" property="rolename" jdbcType="VARCHAR" />
-    <result column="createDate" property="createdate" jdbcType="DATE" />
+    <result column="createDate" property="createdate" jdbcType="TIMESTAMP" />
     <result column="isStart" property="isstart" jdbcType="INTEGER" />
     <result column="createdBy" property="createdby" jdbcType="VARCHAR" />
   </resultMap>
@@ -13,22 +13,23 @@
     id, roleCode, roleName, createDate, isStart, createdBy
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from au_role
     where id = #{id,jdbcType=BIGINT}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from au_role
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.rongxing.bean.AuRole" >
-    insert into au_role (id, roleCode, roleName, 
-      createDate, isStart, createdBy
-      )
-    values (#{id,jdbcType=BIGINT}, #{rolecode,jdbcType=VARCHAR}, #{rolename,jdbcType=VARCHAR}, 
-      #{createdate,jdbcType=DATE}, #{isstart,jdbcType=INTEGER}, #{createdby,jdbcType=VARCHAR}
-      )
+    insert into au_role (id, roleCode, roleName,
+                         createDate, isStart, createdBy
+    )
+    values (#{id,jdbcType=BIGINT}, #{rolecode,jdbcType=VARCHAR}, #{rolename,jdbcType=VARCHAR},
+            #{createdate,jdbcType=TIMESTAMP}, #{isstart,jdbcType=INTEGER}, #{createdby,jdbcType=VARCHAR}
+           )
   </insert>
   <insert id="insertSelective" parameterType="com.rongxing.bean.AuRole" >
     insert into au_role
@@ -63,7 +64,7 @@
         #{rolename,jdbcType=VARCHAR},
       </if>
       <if test="createdate != null" >
-        #{createdate,jdbcType=DATE},
+        #{createdate,jdbcType=TIMESTAMP},
       </if>
       <if test="isstart != null" >
         #{isstart,jdbcType=INTEGER},
@@ -83,7 +84,7 @@
         roleName = #{rolename,jdbcType=VARCHAR},
       </if>
       <if test="createdate != null" >
-        createDate = #{createdate,jdbcType=DATE},
+        createDate = #{createdate,jdbcType=TIMESTAMP},
       </if>
       <if test="isstart != null" >
         isStart = #{isstart,jdbcType=INTEGER},
@@ -97,16 +98,45 @@
   <update id="updateByPrimaryKey" parameterType="com.rongxing.bean.AuRole" >
     update au_role
     set roleCode = #{rolecode,jdbcType=VARCHAR},
-      roleName = #{rolename,jdbcType=VARCHAR},
-      createDate = #{createdate,jdbcType=DATE},
-      isStart = #{isstart,jdbcType=INTEGER},
-      createdBy = #{createdby,jdbcType=VARCHAR}
+        roleName = #{rolename,jdbcType=VARCHAR},
+        createDate = #{createdate,jdbcType=TIMESTAMP},
+        isStart = #{isstart,jdbcType=INTEGER},
+        createdBy = #{createdby,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="queryRoleById" resultType="com.rongxing.bean.AuRole">
+    select *
+    from au_role where id=#{id};
+  </select>
+
+  <select id="listRoleByName" resultType="com.rongxing.bean.AuRole" parameterType="com.rongxing.bean.query.RoleQuery">
+    select *
+    from au_role
+    <where>
+      <if test="rolecode != null and rolecode != ''">
+        and roleCode like "%"#{rolecode}"%"
+      </if>
+    </where>
+  </select>
+
+  <delete id="deleteRoleById">
+    delete from au_role where id=#{id}
+  </delete>
+
+  <select id="selectRoleByName" resultType="java.lang.Integer" parameterType="String">
+    select count(id) from au_role
+    where  roleCode=#{rolecode}
+  </select>
 
   <select id="getAllRoles" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
-    from au_role
+    from au_role where isStart=1
   </select>
+
+  <update id="updateisStartByRoleId">
+    update au_role set isStart=#{isStart} where id=#{roleId}
+  </update>
+
 </mapper>

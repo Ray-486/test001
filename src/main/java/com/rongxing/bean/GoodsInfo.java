@@ -35,6 +35,23 @@ public class GoodsInfo {
     public GoodsInfo() {
     }
 
+    public GoodsInfo(Long id, String goodssn,
+                     String goodsname, Double marketprice,
+                     Double realprice, Integer state, Integer num,
+                     String unit, Date createtime, Date lastupdatetime, String createdby) {
+        this.id = id;
+        this.goodssn = goodssn;
+        this.goodsname = goodsname;
+        this.marketprice = marketprice;
+        this.realprice = realprice;
+        this.state = state;
+        this.num = num;
+        this.unit = unit;
+        this.createtime = createtime;
+        this.lastupdatetime = lastupdatetime;
+        this.createdby = createdby;
+    }
+
     /**
      * @author 廖宇星 Ray
      * @date 2022-09-05

@@ -4,163 +4,178 @@
     <meta charset="UTF-8">
     <title>修改用户</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="Js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript">
+            function saveuser(){
+                var userinfo=new Object();
+                userinfo.id=$("[name='id']").val();
+
+                userinfo.logincode=$("[name='logincode']").val();
+                userinfo.username=$("[name='username']").val();
+                userinfo.password=$("[name='password']").val();
+                userinfo.cardtypename=$("[name='cardtypename']").val();
+                userinfo.idcard=$("[name='idcard']").val();
+                userinfo.country=$("[name='country']").val();
+                userinfo.mobile=$("[name='mobile']").val();
+                userinfo.email=$("[name='email']").val();
+                userinfo.useraddress=$("[name='useraddress']").val();
+                userinfo.postcode=$("[name='postcode']").val();
+                userinfo.rolename=$("[name='rolename']").val();
+                userinfo.bankaccount=$("[name='bankaccount']").val();
+                userinfo.bankname=$("[name='bankname']").val();
+                userinfo.accountholder=$("[name='accountholder']").val();
+                // userinfo.idcardpicpath=$("[name='idcardpicpath']").val();
+                // userinfo.bankpicpath=$("[name='bankpicpath']").val();
+                userinfo.usertypename=$("[name='usertypename']").val();
+
+                $.ajax({
+                    url: "/updateuser",
+                    type: "POST",
+                    data: {userinfo: JSON.stringify(userinfo)},
+                    dataType: "text",
+                    success: function (result) {
+                        if (result) {
+                            alert("更新成功！");
+                            window.location="http://localhost:8080/back_user";
+                        }else {
+                            alert("更新失败-客户端！");
+                        }
+                    },
+                    error: function () {
+                        alert("更新失败-服务器！");
+                    }
+                });
+            }
+
+    </script>
 </head>
 <body>
 <div class="ui container">
-    <form class="ui form" th:action="@{/edit}" method="post" th:object="${user}">
-        <input type="hidden" th:value="*{id}" name="id">
+
+    <form th:object="${user}" >
+        <input type="hidden" th:value="*{id}" name="id" >
         <table width="713" border="0" cellspacing="3" cellpadding="3" align="center">
             <tr>
-                <td width="93" height="34">角色：</td>
-                <td width="320"><select name="rolename" id="rolename">
-                    <option value="0" selected="selected">--请选择-- </option>
-                    <option value="会员">会员</option>
-                    <option value="管理员" >管理员</option>
+                <td width="100" height="34">角色：</td>
+<!--                <td width="320"><input type="text" name="rolename" id="rolename" th:value="*{rolename}">-->
+                <td width="320" >
+                <select name="rolename" id="rolename" th:value="*{rolename}">
+                    <option value="会员" >会员</option>
+                    <option value="管理员">管理员</option>
+                    <option value="其他">其他</option>
                 </select>
                 </td>
                 <td width="93" height="34">会员类型：</td>
-                <td width="320"><select name="usertypename" id="usertypename">
-                    <option value="0" selected="selected">--请选择-- </option>
-                    <option value="会员">注册会员</option>
-                    <option value="vip会员" >vip会员</option>
-                    <option value="消费会员" >消费会员</option>
-                    <option value="加盟店" >加盟店</option>
-                </select>
+<!--                <td width="320"><input type="text" name="usertypename" id="usertypename" th:value="*{usertypename}">-->
+<!--                </td>-->
+                <td width="320" >
+                    <select name="usertypename" id="usertypename" th:value="*{usertypename}">
+                        <option value="注册会员">注册会员</option>
+                        <option value="消费会员">消费会员</option>
+                        <option value="vip会员">vip会员</option>
+                        <option value="加盟店">加盟店</option>
+                    </select>
                 </td>
             </tr>
             <tr>
-                <td>用户名：</td>
-                <td><input type="text" name="logincode" id="logincode"><span style="color:red">*</span></td>
-                <td>姓名：</td>
-                <td><input type="text" name="username" id="username" ><span style="color:red">*</span>
+                <td>账号：</td>
+                <td><input type="text" name="logincode" id="logincode" th:value="*{logincode}" >
+                <td>用户：</td>
+                <td><input type="text" name="username" id="username" th:value="*{username}" required>
+                <td>密码：</td>
+                <td><input type="password" name="password" id="password" th:value="*{password}" required></td>
             </tr>
 
             <tr>
                 <td width="93" height="34">证件类型：</td>
-                <td width="320"><select name="cardtypename" id="cardtypename">
-                    <option value="0" selected="selected">--请选择-- </option>
-                    <option value="会员">二代身份证</option>
-                    <option value="护照" >护照</option>
-                    <option value="军官证" >军官证</option>
-                </select>
+<!--                <td width="320"><input type="text" name="cardtypename" id="cardtypename" th:value="*{cardtypename}">-->
+
+<!--                </td>-->
+                <td width="320" >
+                    <select name="cardtypename" id="cardtypename" th:value="*{cardtypename}">
+                        <option value="二代身份证">二代身份证</option>
+                        <option value="护照">护照</option>
+                        <option value="军官证">军官证</option>
+                    </select>
                 </td>
                 <td>证件号码：</td>
-                <td><input type="text" name="idcard" id="idcard" ><span style="color:red">*</span>
+                <td><input type="text" name="idcard" id="idcard" th:value="*{idcard}" required>
             </tr>
 
             <tr>
-                <td>性别：</td>
+                <td width="93" height="34">收货国家（地区）：</td>
+<!--                <td width="320"><input type="text" name="country" id="country" th:value="*{country}">-->
+<!--                </td>-->
+                <td  >
+                    <select name="country" id="country" width="320" th:value="*{country}">
+                        <option value="中国">中国</option>
+                        <option value="美国">美国</option>
+                    </select>
+                </td>
+                <td>移动电话：</td>
+                <td><input type="text" name="mobile" id="mobile" th:value="*{mobile}" required>
+            </tr>
+
+            <tr>
+                <td>电子邮件：</td>
+                <td><input type="text" name="email" id="email" th:value="*{email}" required>
+                <td>邮政编码：</td>
+                <td><input type="text" name="postcode" id="postcode" th:value="*{postcode}" required>
+            </tr>
+
+            <tr>
+                <td>推荐人：</td>
+                <td><input type="text" name="refercode" id="refercode" th:value="*{refercode}">
+            </tr>
+
+
+            <tr>
+                <td>收货地址：</td>
                 <td>
-                    <label>
-                        <input type="radio" name="stusex" value="0" id="stusex_0" checked>
-                        男</label>
-                    <label>
-                        <input type="radio" name="stusex" value="1" id="stusex_1">
-                        女</label>
-                    <br>
+                    <textarea cols="40" rows="4" id="useraddress" name="useraddress" th:value="*{useraddress}"></textarea>
                 </td>
             </tr>
+
             <tr>
-                <td>身高：</td>
-                <td><input type="number" name="stuheight" id="stuheight" size="8" min="150" max="210" step="5" value="175" >
-                    厘米</td>
+                <td>开户行：</td>
+                <td><input type="text" name="bankname" id="bankname" th:value="*{bankname}">
+                <td>开户卡号：</td>
+                <td><input type="text" name="bankaccount" id="bankaccount" th:value="*{bankaccount}">
             </tr>
+
             <tr>
-                <td>体重:</td>
-                <td><input type="range" name="stuweight" id="stuweight" min="40" max="90" step="2" value="55">
-                    千克</td>
+                <td>开户人：</td>
+                <td><input type="text" name="accountholder" id="accountholder" th:value="*{accountholder}">
             </tr>
-            <tr>
-                <td>生日:</td>
-                <td><input type="date" name="stubirthday" id="stubirthday"></td>
-            </tr>
-            <tr>
-                <td>电话号码：</td>
-                <td><input type="tel" name="phone" id="phone" pattern="^[0-9]{11}$" placeholder="请输入11位电话号码"></td>
-            </tr>
-            <tr>
-                <td>E-mail：</td>
-                <td><input type="email" name="mail" id="mail"></td>
-            </tr>
-            <tr>
-                <td height="28">个人主页：</td>
-                <td><input type="url" name="zhuye" id="zhuye"></td>
-            </tr>
-            <tr>
-                <td>家庭住址：</td>
-                <td><select name="address" id="address">
-                    <option value="0">北京</option>
-                    <option value="1">上海</option>
-                    <option value="2">广州</option>
-                    <option value="3">深圳</option>
-                    <option value="4" selected>成都</option>
-                </select></td>
-            </tr>
-            <tr>
-                <td>我的颜色：</td>
-                <td><input type="color" name="stucolor" id="stucolor"></td>
-            </tr>
-            <tr>
-                <td>我的运动：</td>
-                <td>
-                    <label>
-                        <input type="checkbox" name="sports" value="0" id="sports_0">
-                        篮球</label>
-                    <label>
-                        <input type="checkbox" name="sports" value="1" id="sports_1" checked>
-                        足球</label>
-                    <label>
-                        <input type="checkbox" name="sports" value="2" id="sports_2">
-                        游泳</label>
-                    <label>
-                        <input type="checkbox" name="sports" value="3" id="sports_3" checked>
-                        乒乓球</label>
-                </td>
-            </tr>
-            <tr>
-                <td>常用网址：</td>
-                <td><input type="url" name="usual" id="usual" list="urllist">
-                    <datalist id="urllist">
-                        <option value="https://www.baidu.com/">百度</option>
-                        <option value="https://www.google.cn/">谷歌</option>
-                        <option value="http://www.10jqka.com.cn/">同花顺</option>
-                    </datalist>
-                </td>
-            </tr>
-            <tr>
-                <td>简历2份：</td>
-                <td>
-                    <input type="file" name="resume0" id="resume0">
-                    <input type="file" name="resume1" id="resume1">
-                </td>
-            </tr>
-            <tr>=
-                <td>个人自述：</td>
-                <td rowspan="2"><p>
-                    <textarea name="self" cols="40" rows="4" id="self" placeholder="我是一位特别热爱学习的好孩子。。。"></textarea>
-                </p>
-                    <p>&nbsp;</p></td>
-            </tr>
+
+
+<!--            <tr>-->
+<!--                <td>上传身份证图片（正反面）：</td>-->
+<!--                <td>-->
+<!--                    <input type="file" name="idcardpicpath" id="idcardpicpath" th:value="*{idcardpicpath}">-->
+<!--                </td>-->
+<!--            </tr>-->
+
+<!--            <tr>-->
+<!--                <td>上传银行卡图片：</td>-->
+<!--                <td>-->
+<!--                    <input type="file" name="bankpicpath" id="bankpicpath" th:value="*{bankpicpath}">-->
+<!--                </td>-->
+<!--            </tr>-->
+
             <tr>
                 <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>  <input type="submit" name="zhuce" id="zhuce" value="提交">
-                    <input type="hidden" name="hiddenField2" id="hiddenField2" value="369"></td>
+                <td>  <input type="button" name="save" id="save" value="提交" onclick="saveuser()"/>
                 <td align="left"><input type="reset" name="chongzhi" id="chongzhi" value="重置"></td>
             </tr>
+
+        </table>
     </form>
 
-
 </div>
+
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
-<script>
-    $(".message .close").on('click',function () {
-        $(this).closest(".message")
-            .transition("fade");
-    })
-</script>
+
 </body>
 </html>

@@ -36,12 +36,11 @@ public interface AuUserMapper {
     //根据id删除用户
     public int deleteUserById(Integer id);
 
-    // 修改用户
-    public int updateUser(AuUser user);
-
     // 新增用户
     public int addUser(AuUser user);
 
     // 判断用户名是否存在
     public int selectUserByName(String name);
+
+    public int updateisStartByUid(@Param("isStart") Integer isStart,@Param("uid")Long uid);
 }

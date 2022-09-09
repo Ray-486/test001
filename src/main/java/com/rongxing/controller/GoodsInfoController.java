@@ -1,10 +1,11 @@
 package com.rongxing.controller;
-
-
 import net.sf.json.JSONObject;
+import com.rongxing.bean.GoodsInfoWithBLOBs;
+
 import com.rongxing.bean.GoodsInfo;
 import com.rongxing.service.GoodsInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -32,335 +33,420 @@ public class GoodsInfoController{
 	@Autowired
 	private GoodsInfoService goodsInfoService;
 
+	// 传给前端判断是否为修改页面
+	boolean flagupd=false;
+	// 传给前端判断是否为查找页面
+	boolean flagsel=false;
+	// 后端判断商品编码是否唯一，默认不唯一
+	boolean isFlagGoodsSNOnly=false;
+
+
 	/**
-	 * 到 Ray 的专用测试页面
-	 *
+	 * 商品管理主页
 	 * @author 廖宇星 Ray
 	 * @date 2022-09-05
-	 *
 	 * 测试 http://localhost:8080/goodsinfo/test486
 	 */
 	@RequestMapping(value = "/test486",method = {RequestMethod.GET,RequestMethod.POST})
-	public ModelAndView test486(ModelAndView mv){
-//		System.out.println("test1");
+	public ModelAndView test486(ModelAndView mv,HttpServletRequest request, HttpSession session){
 		// 搜索商品的全部信息
         List<GoodsInfo> list = goodsInfoService.selectGoodsInfoAll();
+		// 把商品传给前端
         mv.addObject("testselectGoodsInfoAll",list);
-//        mv.addObject("test1",486);
-		mv.setViewName("/ray/ray001");
+		// 初始化设置页面的 flag
+		flagtemp(session);
+		// 返回前端页面
+		mv.setViewName("/ray/goodsinfo_management");
 		return mv;
 	}
 
-	/**
-	 * 到 Ray 的专用测试页面  测试用代码，可删
-	 *
-	 * @author 廖宇星 Ray
-	 * @date 2022-09-05
-	 *
-	 * 测试 http://localhost:8080/goodsinfo/test486insertGoodsInfo1
-	 */
-	@RequestMapping(value = "/test486insertGoodsInfo1",method = {RequestMethod.GET,RequestMethod.POST})
-	public ModelAndView test486insertGoodsInfo1(ModelAndView mv){
-		System.out.println("test1");
-		// 搜索商品的全部信息
-		GoodsInfo goodsInfo1=new GoodsInfo();
-		goodsInfo1.setGoodsname("测试1");
-		goodsInfo1.setMarketprice(250.00);
-		goodsInfo1.setRealprice(255.00);
-		goodsInfo1.setNum(9);
-//		Date date = new Date();
-//		SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-//		dateFormat.format(date)
-		goodsInfo1.setLastupdatetime(new Date());
-		goodsInfoService.insertGoodsInfo(goodsInfo1.getGoodsname(),
-				goodsInfo1.getMarketprice(),goodsInfo1.getRealprice(),goodsInfo1.getNum(),goodsInfo1.getLastupdatetime());
-
-		List<GoodsInfo> list = goodsInfoService.selectGoodsInfoAll();
-		mv.addObject("testselectGoodsInfoAll",list);
-		mv.setViewName("/ray/ray001");
-		return mv;
-	}
 
 	/**
-	 * 到 Ray 的专用测试页面
-	 *
+	 * 方法-新增商品
 	 * @author 廖宇星 Ray
 	 * @date 2022-09-05
-	 *
-	 * 测试 http://localhost:8080/goodsinfo/test486insertGoodsInfo
+	 * 测试 http://localhost:8080/goodsinfo/insertGoodsInfo
 	 */
-	@RequestMapping(value = "/test486insertGoodsInfo",method = {RequestMethod.GET,RequestMethod.POST})
+	@RequestMapping(value = "/insertGoodsInfo",method = {RequestMethod.GET,RequestMethod.POST})
 	@ResponseBody
-	public ModelAndView test486insertGoodsInfo(@RequestParam String goodsinfo,ModelAndView mv, HttpServletRequest request, HttpSession session){
-
-		System.out.println("当前测试1");
-
-		//转换前端传回来的json
+	public boolean insertGoodsInfo(@RequestParam String goodsinfo,ModelAndView mv, HttpServletRequest request, HttpSession session){
+		// 判断商品编号是否唯一
+		if (isFlagGoodsSNOnly){
+			// 若商品编号不唯一，不能插入
+			System.out.println("商品编号不唯一");
+			return false;
+		}
+		// 设置返回是否成功
+		boolean flag;
+		// 转换前端传回来的json
 		JSONObject goodsinfoObject = JSONObject.fromObject(goodsinfo);
-		//转换成Role对象
-		GoodsInfo add_goodsinfo =  (GoodsInfo)JSONObject.toBean(goodsinfoObject,GoodsInfo.class);
-		//更新最后操做时间
+		// 转换成 GoodsInfoWithBLOBs 对象
+		GoodsInfoWithBLOBs add_goodsinfo =  (GoodsInfoWithBLOBs)JSONObject.toBean(goodsinfoObject,GoodsInfoWithBLOBs.class);
+		// id自增，设置为null
+		add_goodsinfo.setId(null);
+		// 设置state状态，1为上架，2为下架
+		if ((boolean) goodsinfoObject.get("state")){
+			add_goodsinfo.setState(1);
+		}else {
+			add_goodsinfo.setState(2);
+		}
+		// 设置当前操作时间
+		add_goodsinfo.setCreatetime(new Date());
+		// 设置最后操做时间
 		add_goodsinfo.setLastupdatetime(new Date());
+		// 设置创建人
+		add_goodsinfo.setCreatedby("lyx");
+		// 插入数据
+		int count = goodsInfoService.insertGoodsInfo(add_goodsinfo);
+		// 返回值大于0插入成功
+		if(count>0){
+			flag=true;
+		}else {
+			flag=false;
+		}
+		// 插入完重新查询数据库（刷新操作）
+		List<GoodsInfo> list = goodsInfoService.selectGoodsInfoAll();
+		// 返回数据给前端
+		mv.addObject("testselectGoodsInfoAll",list);
+		// 返回前端界面
+		mv.setViewName("/ray/goodsinfo_management");
+		return flag;
+	}
 
-		boolean ifInsertSuccess = goodsInfoService.insertGoodsInfo(add_goodsinfo.getGoodsname(),
-				add_goodsinfo.getMarketprice(), add_goodsinfo.getRealprice(), add_goodsinfo.getNum(), add_goodsinfo.getLastupdatetime());
 
-		System.out.println(ifInsertSuccess);
+
+	/**
+	 * 方法-通过id查找商品信息
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-06
+	 * 测试 http://localhost:8080/goodsinfo/selectByPrimaryKey
+	 */
+	@RequestMapping("/selectByPrimaryKey")
+	@ResponseBody
+	public ModelAndView selectByPrimaryKey(@RequestBody String id,ModelAndView mv,HttpServletRequest request,HttpSession session){
+		// 转换前端传回来的json
+		JSONObject idObject = JSONObject.fromObject(id);
+		// 转换成 String 类型
+		String myid1=(String) idObject.get("id");
+		// 创建Long对象，将String转化long
+//		Long myid =new Long(myid1); // int转long
+		Long myid = Long.valueOf(myid1);
+		// 通过id查找商品信息
+		GoodsInfoWithBLOBs goodsInfo=goodsInfoService.selectByPrimaryKey(myid);
+		// 返回数据给前端
+		session.setAttribute("selectByPrimaryKeyGoodsInfo",goodsInfo);
+		// 返回前端页面
+		mv.setViewName("/ray/goodsinfo_management");
+		return mv;
+	}
+
+
+	/**
+	 * 方法-修改商品
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-06
+	 * 测试 http://localhost:8080/goodsinfo/updateGoodsInfo
+	 */
+	@RequestMapping("/updateGoodsInfo")
+	@ResponseBody
+	public boolean updateGoodsInfo(@RequestParam String goodsinfo,ModelAndView mv, HttpServletRequest request, HttpSession session){
+		// 设置返回是否成功
+		boolean flag;
+		// 转换前端传回来的json
+		JSONObject goodsinfoObject = JSONObject.fromObject(goodsinfo);
+		// 转换成 GoodsInfoWithBLOBs 对象
+		GoodsInfoWithBLOBs goodsinfo1 =  (GoodsInfoWithBLOBs)JSONObject.toBean(goodsinfoObject,GoodsInfoWithBLOBs.class);
+		// 设置最后操做时间
+		goodsinfo1.setLastupdatetime(new Date());
+		// 设置state状态，1为上架，2为下架
+		if (((Integer)goodsinfoObject.get("state"))==1){
+			goodsinfo1.setState(1);
+		}else {
+			goodsinfo1.setState(2);
+		}
+		// 修改商品信息
+		int count = goodsInfoService.updateGoodsInfo(goodsinfo1);
+		// 判断是否修改成功
+		if(count>0){
+			// 大于0表示修改成功
+			flag=true;
+		}else {
+			// 其它表示修改失败
+			flag=false;
+		}
+		// 修改完重新查询数据库并返回数据给前端
+		List<GoodsInfo> list = goodsInfoService.selectGoodsInfoAll();
+		// 向前端返回数据
+		mv.addObject("testselectGoodsInfoAll",list);
+		// 返回前端界面
+		mv.setViewName("/ray/goodsinfo_management");
+		// ajax请求返回，返回前端,true是成功修改
+		return flag;
+	}
+
+	/**
+	 * 方法-删除商品
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-06
+	 * 测试 http://localhost:8080/goodsinfo/deleteByPrimaryKey
+	 */
+	@RequestMapping("/deleteByPrimaryKey")
+	@ResponseBody
+	public boolean deleteByPrimaryKey(@RequestBody String id,ModelAndView mv,HttpServletRequest request,HttpSession session){
+		// 设置返回是否成功
+		boolean flag;
+		// 转换前端传回来的json
+		JSONObject idObject = JSONObject.fromObject(id);
+		// 转换成 String 类型
+		String myid1=(String) idObject.get("id");
+		// 创建Long对象，将String转化long
+//		Long myid =new Long(myid1); // int转long
+		Long myid = Long.valueOf(myid1);
+		// 删除商品信息
+		int count = goodsInfoService.deleteByPrimaryKey(myid);
+		// 判断是否删除成功
+		if(count>0){
+			// 大于0表示删除成功
+			flag=true;
+		}else {
+			// 其它表示删除失败
+			flag=false;
+		}
+		// 修改完重新查询数据库并返回数据给前端
+		List<GoodsInfo> list = goodsInfoService.selectGoodsInfoAll();
+		// 向前端传递数据
+		mv.addObject("testselectGoodsInfoAll",list);
+		// 返回前端界面
+		mv.setViewName("/ray/goodsinfo_management");
+		// ajax请求返回，返回前端,true是成功修改
+		return flag;
+	}
+
+
+
+	/**
+	 * 方法-通过goodsName查找商品信息
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-07
+	 * 测试 http://localhost:8080/goodsinfo/selectGoodsInfobyGoodsName
+	 */
+	@RequestMapping("/selectGoodsInfobyGoodsName")
+	@ResponseBody
+	public ModelAndView selectGoodsInfobyGoodsName(@RequestBody String selectmessage,ModelAndView mv,HttpServletRequest request,HttpSession session){
+		// 转换前端传回来的json
+		JSONObject goodsNameObject = JSONObject.fromObject(selectmessage);
+		// 转换成 String 对象
+		String goodsName=(String) goodsNameObject.get("selectmessage");
+		// 为sql语句 模糊搜索
+		goodsName="%"+goodsName+"%";
+		// 通过goodsName查找商品信息
+		List<GoodsInfo> list=goodsInfoService.selectGoodsInfobyGoodsName(goodsName);
+		// 传回前端
+		session.setAttribute("selectGoodsInfobyGoodsName",list);
+		// 返回前端页面
+		mv.setViewName("/ray/goodsinfo_management");
+		return mv;
+	}
+
+	/**
+	 * 查询专用跳转方法
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-07
+	 * 测试 http://localhost:8080/goodsinfo/selectGoodsInfobyGoodsNametemp
+	 */
+	@RequestMapping(value = "/selectGoodsInfobyGoodsNametemp",method = {RequestMethod.GET,RequestMethod.POST})
+	public ModelAndView selectGoodsInfobyGoodsNametemp(ModelAndView mv,HttpServletRequest request, HttpSession session){
+		// 只有这 flagsel 为TRUE
+		flagsel=true;
+		// 传回前端
+		session.setAttribute("flagsel",flagsel);
+		// 返回页面
+		mv.setViewName("/ray/goodsinfo_management");
+		return mv;
+	}
+
+
+	/**
+	 * 跳转页面
+	 * @return
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-07
+	 */
+	@RequestMapping("/goodsinfo_add")
+	public String goodsinfo_add_temp(){ return "/ray/goodsinfo_add"; }
+
+	/**
+	 * 修改功能专用跳转方法
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-07
+	 * 测试 http://localhost:8080/goodsinfo/updatetemp
+	 */
+	@RequestMapping(value = "/updatetemp",method = {RequestMethod.GET,RequestMethod.POST})
+	public ModelAndView updatetemp(ModelAndView mv,HttpServletRequest request, HttpSession session){
+		// 搜索商品的全部信息
 		List<GoodsInfo> list = goodsInfoService.selectGoodsInfoAll();
 		mv.addObject("testselectGoodsInfoAll",list);
-		mv.setViewName("/ray/ray001");
+		// 只有这flagupd为 true
+		flagupd=true;
+		session.setAttribute("flagupd",flagupd);
+		mv.setViewName("/ray/goodsinfo_management");
 		return mv;
+	}
+
+
+	/**
+	 * 查看专用跳转方法
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-07
+	 * 测试 http://localhost:8080/goodsinfo/showtemp
+	 */
+	@RequestMapping(value = "/showtemp",method = {RequestMethod.GET,RequestMethod.POST})
+	public ModelAndView showtemp(ModelAndView mv,HttpServletRequest request, HttpSession session){
+		mv.setViewName("/ray/goodsinfo_show");
+		return mv;
+	}
 
 
 
+	/**
+	 * 验证商品编号是否唯一
+	 * @param
+	 * @return true是不唯一
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-08
+	 * 测试 http://localhost:8080/goodsinfo/ifGoodsSNOnly
+	 */
+	@RequestMapping(value = "/ifGoodsSNOnly",method = {RequestMethod.GET,RequestMethod.POST})
+	@ResponseBody
+	public boolean ifGoodsSNOnly(@RequestParam String goodsSN,ModelAndView mv, HttpServletRequest request, HttpSession session){
+		// 转换前端传回来的json
+		JSONObject goodsSNObject = JSONObject.fromObject(goodsSN);
+		// 转换成 String
+		String strgoodsSN=(String)goodsSNObject.get("goodsSN");
+		// 查看收索到几个相同的商品编号
+		int count = (goodsInfoService.selectGoodsCountByGoodsSN(strgoodsSN)).intValue();
+		// 返回值大于0说明不唯一
+		if(count>0){
+			isFlagGoodsSNOnly=true;
+		}else {
+			isFlagGoodsSNOnly=false;
+		}
+		// 返回前端界面
+		mv.setViewName("/ray/goodsinfo_add");
+		// ajax请求返回，返回前端
+		return isFlagGoodsSNOnly;
+	}
 
-
-
-//		System.out.println("当前测试1");
-//		// 搜索商品的全部信息
-//		GoodsInfo goodsInfo1=new GoodsInfo();
-//		goodsInfo1.setGoodsname(request.getParameter("goodsname"));
-//		Double d1 = new Double(request.getParameter("marketprice"));
-//		goodsInfo1.setMarketprice(d1);
-//		Double d2 = new Double(request.getParameter("realprice"));
-//		goodsInfo1.setRealprice(d2);
-//		Integer i1=new Integer(request.getParameter("num"));
-//		goodsInfo1.setNum(i1);
-////		Date date = new Date();
-////		SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :hh:mm:ss");
-////		dateFormat.format(date)
-//		goodsInfo1.setLastupdatetime(new Date());
-//
-//		boolean ifInsertSuccess = goodsInfoService.insertGoodsInfo(goodsInfo1.getGoodsname(),
-//				goodsInfo1.getMarketprice(), goodsInfo1.getRealprice(), goodsInfo1.getNum(), goodsInfo1.getLastupdatetime());
-//
-//		System.out.println(ifInsertSuccess);
-//		List<GoodsInfo> list = goodsInfoService.selectGoodsInfoAll();
-//		mv.addObject("testselectGoodsInfoAll",list);
-//		mv.setViewName("/ray/ray001");
-//		return mv;
+	/**
+	 * 设置页面 flag
+	 * @param session
+	 * @author 廖宇星 Ray
+	 * @date 2022-09-05
+	 */
+	public void flagtemp(HttpSession session){
+		// 哔哔哔 可能有bug改
+		// 设置为非更新页面
+		flagupd=false;
+		// 设置为非查询页面
+		flagsel=false;
+		session.setAttribute("flagupd",flagupd);
+		session.setAttribute("flagsel",flagsel);
 	}
 
 
 
 
+//	/**
+//	 * 验证商品编号是否唯一
+//	 * @param goodsSN
+//	 * @return
+//	 * @author 廖宇星 Ray
+//	 * @date 2022-09-08
+//	 * 测试 http://localhost:8080/goodsinfo/ifGoodsSNOnly
+//	 */
+//	@RequestMapping(value = "/ifGoodsSNOnly1",method = {RequestMethod.GET,RequestMethod.POST})
+//	@ResponseBody
+//	public ModelAndView ifGoodsSNOnly1(@RequestBody String goodsSN, ModelAndView mv, HttpServletRequest request){
+//		// 转换前端传回来的json
+//		JSONObject goodsSNObject = JSONObject.fromObject(goodsSN);
+//		// 转换成 String 对象
+//		String strgoodsSN=(String) goodsSNObject.get("goodsSN");
+//		// 查看收索到几个相同的商品编号
+//		int count = (goodsInfoService.selectGoodsCountByGoodsSN(strgoodsSN)).intValue();
+//		//
+//		boolean flagGoodsSNOnly;
+//		if(count>0){
+//			flagGoodsSNOnly=false;
+//		}else {
+//			flagGoodsSNOnly=true;
+//		}
+//
+//		request.setAttribute("flagGoodsSNOnly",flagGoodsSNOnly);
+//		mv.setViewName("/ray/goodsinfo_add");
+//		return mv;
+//	}
+
+
+//	/**
+//	 * 分页显示 失败
+//	 * @author 廖宇星 Ray
+//	 * @date 2022-09-05
+//	 * 测试 http://localhost:8080/goodsinfo/getGoodsInfoByPage
+//	 */
+//	@RequestMapping(value = "/getGoodsInfoByPage",method = {RequestMethod.GET,RequestMethod.POST})
+//	public ModelAndView getGoodsInfoByPage(@RequestBody String pageNum,ModelAndView mv,HttpServletRequest request, HttpSession session){
+//
+//
+//		// 转换前端传回来的json
+//		JSONObject pageNumObject = JSONObject.fromObject(pageNum);
+//		// 转换成 goodsNameObject 对象
+//		String strPageNum=(String) pageNumObject.get("pageNum");
+//
+//
+//		Integer intPageNum=Integer.valueOf(strPageNum);
+////		前端通过name传值测试成功
+////		Integer intPageNum=Integer.valueOf(request.getParameter("pageNum"));
+//
+//		//获取当前页数
+//		intPageNum=intPageNum==null?1:intPageNum*10;
+//
+//
+//
+//		List<GoodsInfo> list = goodsInfoService.getGoodsInfoByPage(intPageNum);
+////		session.setAttribute("testselectGoodsInfoAll",list);
+//		mv.addObject("testselectGoodsInfoAll",list);
+//
+//		// 设置页面 flag
+//		flagtemp(session);
+//
+////		测试
+////        mv.addObject("test1",486);
+//		mv.setViewName("/ray/goodsinfo_management");
+//
+//		return mv;
+//	}
+
+//  分页失败
+//	@RequestMapping(value = "/test486",method = {RequestMethod.GET,RequestMethod.POST})
+//	public ModelAndView test486(String strPageNum,ModelAndView mv,HttpServletRequest request, HttpSession session){
+//		Integer pageNum=strPageNum==null?0:(Integer.parseInt(strPageNum)-1)*10;
+//		// 搜索商品的全部信息
+//		List<GoodsInfo> list = goodsInfoService.getGoodsInfoByPage(pageNum);
+//		// 把商品传给前端
+//		mv.addObject("testselectGoodsInfoAll",list);
+////		session.setAttribute("pageNum",-1);
+//		// 设置页面 flag
+//		flagtemp(session);
+//		mv.setViewName("/ray/goodsinfo_management");
+//		return mv;
+//	}
+//	@RequestMapping(value = "/getGoodsInfoByPagetemp",method = {RequestMethod.GET,RequestMethod.POST})
+//	public ModelAndView getGoodsInfoByPagetemp(ModelAndView mv,HttpServletRequest request, HttpSession session){
+//		mv.setViewName("/ray/goodsinfo_management");
+//		return mv;
+//	}
 
 
 
-//
-//
-//	@RequestMapping("/backend/goodslist.html")
-//	public ModelAndView goodsList(HttpSession session,Model model,
-//								 @RequestParam(value="s_goodsName",required=false) String s_goodsName){
-//		Map<String,Object> baseModel= (Map<String,Object>)session.getAttribute(Constants.SESSION_BASE_MODEL);
-//		if(baseModel == null){
-//			return new ModelAndView("redirect:/");
-//		}else{
-//			GoodsInfo goodsInfo = new GoodsInfo();
-//			if(null != s_goodsName)
-//				goodsInfo.setGoodsName("%"+SQLTools.transfer(s_goodsName)+"%");
-//			goodsInfo.setState(1);
-//			goodsInfo.setStarNum(0);
-//			goodsInfo.setPageSize(10000);
-//			List<GoodsInfo> goodsInfoList = null;
-//				try {
-//					goodsInfoList = goodsInfoService.getGoodsInfoList(goodsInfo);
-//				}catch (Exception e) {
-//					// TODO: handle exception
-//					e.printStackTrace();
-//					goodsInfoList = null;
-//				}
-//			model.addAllAttributes(baseModel);
-//			model.addAttribute("goodsInfoList", goodsInfoList);
-//			model.addAttribute("s_goodsName", s_goodsName);
-//			return new ModelAndView("/backend/goodslist");
-//		}
-//	}
-	
-	
-	
-	/**
-	 * 获取列表（分页）
-	 * @return
-	 */
-//	@RequestMapping("/backend/goodsinfolist.html")
-//	public ModelAndView goodsInfoList(HttpSession session,Model model,
-//								@RequestParam(value="currentpage",required=false)Integer currentpage ,
-//								@RequestParam(value="s_goodsName",required=false) String s_goodsName,
-//								@RequestParam(value="s_state",required=false) String s_state
-//								){
-//		Map<String,Object> baseModel= (Map<String,Object>)session.getAttribute(Constants.SESSION_BASE_MODEL);
-//		if(baseModel == null){
-//			return new ModelAndView("redirect:/");
-//		}else{
-//			GoodsInfo goodsInfo = new GoodsInfo();
-//			if(null != s_goodsName)
-//				goodsInfo.setGoodsName("%"+SQLTools.transfer(s_goodsName)+"%");
-//			if(!StringUtils.isNullOrEmpty(s_state))
-//				goodsInfo.setState(Integer.valueOf(s_state));
-//			else
-//				goodsInfo.setState(null);
-//			PageSupport page = new PageSupport();
-//
-//			try{
-//				page.setTotalCount(goodsInfoService.count(goodsInfo));
-//			}catch (Exception e1) {
-//				// TODO: handle exception
-//				e1.printStackTrace();
-//				page.setTotalCount(0);
-//			}
-//			if(page.getTotalCount() > 0){
-//				if(currentpage != null)
-//					page.setPage(currentpage);
-//				if(page.getPage() <= 0)
-//					page.setPage(1);
-//				if(page.getPage() > page.getPageCount())
-//					page.setPage(page.getPageCount());
-//				goodsInfo.setStarNum((page.getPage() - 1) * page.getPageSize());
-//				goodsInfo.setPageSize(page.getPageSize());
-//				List<GoodsInfo> goodsInfoList = null;
-//				try {
-//					goodsInfoList = goodsInfoService.getGoodsInfoList(goodsInfo);
-//				}catch (Exception e) {
-//					// TODO: handle exception
-//					e.printStackTrace();
-//					goodsInfoList = null;
-//					if(page == null){
-//						page = new PageSupport();
-//						page.setItems(null);
-//					}
-//				}
-//				page.setItems(goodsInfoList);
-//			}else{
-//				page.setItems(null);
-//			}
-//			model.addAllAttributes(baseModel);
-//			model.addAttribute("page", page);
-//			model.addAttribute("s_goodsName", s_goodsName);
-//			model.addAttribute("s_state", s_state);
-//			return new ModelAndView("/backend/goodsinfolist");
-//		}
-//	}
-//
-//	@RequestMapping(value = "/backend/addgoodsinfo.html",method=RequestMethod.POST)
-//	public ModelAndView addGoodsInfo(HttpSession session,@ModelAttribute("addGoodsInfo") GoodsInfo addGoodsInfo){
-//		if(session.getAttribute(Constants.SESSION_BASE_MODEL) == null){
-//			return new ModelAndView("redirect:/");
-//		}else{
-//			try {
-//				addGoodsInfo.setCreateTime(new Date());
-//				addGoodsInfo.setCreatedBy(((User)session.getAttribute(Constants.SESSION_USER)).getLoginCode());
-//				addGoodsInfo.setLastUpdateTime(new Date());
-//				goodsInfoService.addGoodsInfo(addGoodsInfo);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			return new ModelAndView("redirect:/backend/goodsinfolist.html");
-//		}
-//	}
-//
-//	@RequestMapping(value = "/backend/modifygoodsinfo.html",method=RequestMethod.POST)
-//	public ModelAndView modifyGoodsInfo(HttpSession session,@ModelAttribute("modifyGoodsInfo") GoodsInfo modifyGoodsInfo){
-//		if(session.getAttribute(Constants.SESSION_BASE_MODEL) == null){
-//			return new ModelAndView("redirect:/");
-//		}else{
-//			try {
-//				modifyGoodsInfo.setLastUpdateTime(new Date());
-//				goodsInfoService.modifyGoodsInfo(modifyGoodsInfo);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			return new ModelAndView("redirect:/backend/goodsinfolist.html");
-//		}
-//	}
-//
-//	@RequestMapping(value = "/backend/delgoodsinfo.html", produces = {"text/html;charset=UTF-8"})
-//	@ResponseBody
-//	public String delGoodsInfo(@RequestParam(value="delId",required=false) String delId){
-//
-//		String result= "false" ;
-//		GoodsInfo delGoodsInfo = new GoodsInfo();
-//		delGoodsInfo.setId(Integer.valueOf(delId));
-//		try {
-//			if(goodsInfoService.isExitInPack(delGoodsInfo) > 0){
-//				result = "isused";
-//			}else{
-//				if(goodsInfoService.deleteGoodsInfo(delGoodsInfo) > 0)
-//					result = "success";
-//			}
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		return result;
-//	}
-//
-//	@RequestMapping(value = "/backend/goodsSNisexit.html", produces = {"text/html;charset=UTF-8"})
-//	@ResponseBody
-//	public String loginCodeIsExit(@RequestParam(value="goodsSN",required=false) String goodsSN,
-//								  @RequestParam(value="id",required=false) String id){
-//		String result = "failed";
-//		GoodsInfo _goodsInfo = new GoodsInfo();
-//		_goodsInfo.setGoodsSN(goodsSN);
-//		if(!id.equals("-1"))
-//			_goodsInfo.setId(Integer.valueOf(id));
-//		try {
-//			if(goodsInfoService.goodsSNIsExit(_goodsInfo) == 0)
-//				result = "only";
-//			else
-//				result = "repeat";
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return result;
-//		}
-//		return result;
-//	}
-//
-//	@RequestMapping(value = "/backend/getgoodsinfo.html", produces = {"text/html;charset=UTF-8"})
-//	@ResponseBody
-//	public Object getGoodsInfo(@RequestParam(value="id",required=false) String id){
-//		String cjson = "";
-//		if(null == id || "".equals(id)){
-//			return "nodata";
-//		}else{
-//			try {
-//				GoodsInfo goodsInfo = new GoodsInfo();
-//				goodsInfo.setId(Integer.valueOf(id));
-//				goodsInfo = goodsInfoService.getGoodsInfoById(goodsInfo);
-//				JsonConfig jsonConfig = new JsonConfig();
-//				jsonConfig.registerJsonValueProcessor(Date.class,new JsonDateValueProcessor());
-//				JSONObject jo = JSONObject.fromObject(goodsInfo,jsonConfig);
-//				cjson = jo.toString();
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				return "failed";
-//			}
-//				return cjson;
-//		}
-//	}
-//
-//	@RequestMapping("/backend/modifystate.html")
-//	@ResponseBody
-//	public Object modifyState(HttpSession session,@RequestParam String state){
-//
-//		if(null == state || "".equals(state)){
-//			return "nodata";
-//		}else{
-//			JSONObject goodsInfoObject = JSONObject.fromObject(state);
-//			GoodsInfo stateObjGoodsInfo =  (GoodsInfo)JSONObject.toBean(goodsInfoObject, GoodsInfo.class);
-//			try {
-//				goodsInfoService.modifyGoodsInfo(stateObjGoodsInfo);
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				return "failed";
-//			}
-//			return "success";
-//		}
-//
-//	}
-	
+
 }

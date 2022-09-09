@@ -1,0 +1,193 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    margin:0 auto;
+    /*text-align:center;*/
+}
+#goodsinfo_upd span{
+    color: red;
+}
+
+.div1{
+    margin-left: 3%;
+    position:relative;
+    left: 22%;
+    top: 10%;
+
+    text-align: center;
+    /*width:640px;*/
+    width: 50%;
+    height:80px;
+    line-height: 80px;
+    font-size: 34px;
+    font-weight: bold;
+    color: black;
+
+}
+.div2{
+    width:100%;
+    height:50px;
+    font-size: 18px;
+}
+.div3{
+    float: left;
+    width: 70%;
+    position: relative;
+    left: 19%;
+    top: 20%;
+}
+.div3 button{
+
+    background-color: rgba(53, 189, 229, 0.87);
+    margin-left: 20px;
+    border: none;
+    color:white;
+    padding:8px 28px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    /*margin: 4px 2px;*/
+    border-radius: 1.5em;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+.div3 button:hover{
+    background-color: white;
+    color: black;
+    text-shadow : skyblue 0 5px 6px, skyblue 1px 3px 3px;
+    /* 水平垂直阴影相等，模糊距离大一点，阴影尺寸小一点即可实现 */
+    box-shadow: skyblue 0px 3px 8px;
+    /*box-shadow: skyblue 0 5px 6px, skyblue 1px 3px 3px;;*/
+    /*border:1px solid skyblue;*/
+    /*color: #1795bb;*/
+}
+
+
+#main_table{
+    margin:0 auto;
+    width: 70%;
+    border:1px solid skyblue;
+    border-collapse: collapse;
+}
+#main_table tr th{
+    font-family: 微软雅黑;
+    font-size: 18px;
+    font-weight: bold;
+    /*border-bottom:1px dashed #CCCCCC;*/
+    background-color: rgba(183, 230, 245, 0.62);
+    color: black;
+    text-align: center;
+    padding: 20px;
+    height:28px;
+    line-height:28px;
+}
+#main_table tr td{
+    height: 45px;
+    line-height:30px;
+    padding: 2px;
+    font-family: 微软雅黑;
+    font-size: 16px;
+    text-align: center;
+    color: black;
+}
+#main_table tr:nth-child(2n+3){
+    background-color: rgb(228,238,248);
+}
+
+#main_table tr:hover{
+    background-color: rgba(183, 230, 245, 0.62);
+    cursor: not-allowed;
+}
+
+.div4{
+    width: 30%;
+    float: left;
+    position: relative;
+    right: 12%;
+    top: 16%;
+}
+
+
+#sel_message{
+    font-family: SimSun, 'Open Sans', sans-serif;
+    /*font-style: sans-serif;*/
+    width: 45%;
+    height: 40px;
+    position:relative;
+    top: -2%;
+    left: 1%;
+    margin-top: 0%;
+    margin-right: 5%;
+    outline: none;
+    padding-left: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+    /* text-shadow: 1px 1px 1px; */
+    border-top: 1px solid #312E3D;
+    border-left: 1px solid #312E3D;
+    border-right: 1px solid #312E3D;
+    border-bottom: 1px solid #56536A;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+
+}
+
+#sel_message::-webkit-input-placeholder{
+    color: #986655;
+    font-size: 12px;
+}
+
+
+
+#sel {
+    padding: 8px 28px;
+    font-size: 18px;
+    border-radius: 1.5em;
+    cursor: pointer;
+
+    --c: no-repeat linear-gradient(rgba(53,189,229,0.87) 0 0);
+    border:1px solid skyblue;
+    background:
+            var(--c) calc(-100% + var(--i, 0) * 100%) 100% / 50% calc(100% * var(--i, 0) + .08em),
+            var(--c) calc( 200% - var(--i, 0) * 100%) 0 / 50% calc(100% * var(--i, 0) + .08em);
+    transition: .3s calc(var(--i, 0) * .3s), background-position .3s calc(.3s - var(--i, 0) * .3s);
+}
+#sel:hover {
+    --i: 1;
+    color: white;
+}
+
+
+.div111 {
+    margin-left: 3%;
+    position:relative;
+    left: 19%;
+    top: 10%;
+    text-align: center;
+    /*width:640px;*/
+    width: 50%;
+    height:80px;
+    line-height: 80px;
+    font-size: 34px;
+    font-weight: bold;
+    color: black;
+}
+.div222{
+    width: 50%;
+    margin-left: 40%;
+}
+.div333{
+    width: 50%;
+
+    margin-top: 2%;
+    position: relative;
+
+    top: 1%;
+    left: 45%;
+}

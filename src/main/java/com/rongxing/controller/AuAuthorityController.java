@@ -58,7 +58,7 @@ public class AuAuthorityController {
     /**
      *修改权限
      */
-    @RequestMapping(value="/modify_function")
+    @RequestMapping(value="/modify_function",produces="text/html;charset=UTF-8")
     @ResponseBody
     public String modifyFunction(String mdata, HttpSession session){
         AuUser auUser = (AuUser) session.getAttribute("auUser");

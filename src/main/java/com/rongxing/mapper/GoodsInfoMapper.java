@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 数据访问层
+ * 数据访问层 dao
  * 商品信息 GoodsInfo
  * 添加 selectGoodsInfoAll 方法
  * @author 廖宇星 Ray
@@ -26,23 +26,41 @@ public interface GoodsInfoMapper {
     List<GoodsInfo> selectGoodsInfoAll();
 
 
+
     /**
      * 增加商品的方法
      * @author 廖宇星 Ray
      * @date 2022-09-05
-     * @param goodsname 商品名称
-     * @param marketprice 市场价
-     * @param realprice 优惠价
-     * @param num 库存
-     * @param lastupdatetime 最后修改时间
-     * @return 是否添加成功
+     * @param record
+     * @return
      */
-    boolean insertGoodsInfo(@Param("goodsname") String goodsname, @Param("marketprice") Double marketprice,
-                            @Param("realprice") Double realprice, @Param("num") Integer num,
-                            @Param("lastupdatetime") Date lastupdatetime);
+    int insertGoodsInfo(GoodsInfoWithBLOBs record);
 
 
+    /**
+     * 按商品名查询商品的方法
+     * @return 返回GoodsInfo类
+     * @author 廖宇星 Ray
+     * @date 2022-09-07
+     */
+    List<GoodsInfo> selectGoodsInfobyGoodsName(String selectmessage);
 
+    /**
+     * 分页显示商品方法
+     * @return 返回GoodsInfo类
+     * @author 廖宇星 Ray
+     * @date 2022-09-05
+     */
+    List<GoodsInfo> getGoodsInfoByPage(Integer pageNum);
+
+    /**
+     * 证商品编号是否唯一
+     * @param goodsSN
+     * @return 商品编号相同的个数
+     * @author 廖宇星 Ray
+     * @date 2022-09-07
+     */
+    Integer selectGoodsCountByGoodsSN(String goodsSN);
 
     // 以下为逆向工程自动生成
     int deleteByPrimaryKey(Long id);
@@ -55,6 +73,11 @@ public interface GoodsInfoMapper {
 
     int updateByPrimaryKeySelective(GoodsInfoWithBLOBs record);
 
+    /**
+     * 更新的方法 自动生成
+     * @param record
+     * @return
+     */
     int updateByPrimaryKeyWithBLOBs(GoodsInfoWithBLOBs record);
 
     int updateByPrimaryKey(GoodsInfo record);

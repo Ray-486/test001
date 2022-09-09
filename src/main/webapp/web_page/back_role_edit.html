@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改用户</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="Js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript">
+
+            function saverole(){
+                var roleinfo=new Object();
+
+                roleinfo.id=$("[name='id']").val();
+                roleinfo.rolecode=$("[name='rolecode']").val();
+                roleinfo.rolename=$("[name='rolename']").val();
+                console.log($("[name='isstart']:checked").val());
+                roleinfo.isstart=$("[name='isstart']:checked").val();
+
+                $.ajax({
+                    url: "/updaterole",
+                    type: "POST",
+                    data: {roleinfo: JSON.stringify(roleinfo)},
+                    dataType: "text",
+                    success: function (result) {
+                        if (result) {
+                            alert("更新成功！");
+                            window.location="http://localhost:8080/back_role_management.html";
+                        }else {
+                            alert("更新失败-客户端！");
+                        }
+                    },
+                    error: function () {
+                        alert("添加失败-服务器！");
+                    }
+                });
+            }
+
+    </script>
+</head>
+<body>
+<div class="ui container">
+
+    <form th:object="${role}"  >
+    <input type="hidden" th:value="*{id}" name="id">
+    <table width="713" border="0" cellspacing="3" cellpadding="3" align="center">
+
+        <tr>
+            <td>角色编号：</td>
+            <td><input type="text" name="rolecode" id="rolecode" th:value="*{rolecode}">
+        </tr>
+        <tr>
+            <td>角色名称：</td>
+            <td><input type="text" name="rolename" id="rolename" th:value="*{rolename}">
+        </tr>
+
+        <tr>
+            <td>角色状态：</td>
+            <td>
+                <input type="radio" name="isstart" checked="checked" value="1">启用
+                <input type="radio" name="isstart" value="0">禁用
+            </td>
+        </tr>
+
+        <tr>
+            <td>&nbsp;</td>
+            <td>  <input type="button" name="button" id="save" value="提交" onclick="saverole()"/>
+            <td align="left"><input type="reset" name="chongzhi" id="chongzhi" value="重置"></td>
+        </tr>
+    </table>
+    </form>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+
+</body>
+</html>

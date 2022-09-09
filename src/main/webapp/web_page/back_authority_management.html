@@ -14,7 +14,7 @@
         #function {
             float: left;
             height: 500px;
-            width:100%;
+            width: 100%;
         }
 
         .title {
@@ -22,7 +22,7 @@
             height: 20px;
             width: 100%;
             text-align: left;
-            margin:0px;
+            margin: 0px;
             padding: 0px;
         }
 
@@ -59,74 +59,82 @@
         }
 
         #authroity {
-            width: 1050px;
-            margin-left: 9px;
+            width: 1052px;
+            margin-left: 7px;
             font-size: 12px;
             color: #000;
             border-collapse: collapse;
             vertical-align: top;
             background-color: rgb(247, 248, 249);
-            font-family: Arial,"Arial Black","微软雅黑","宋体";
+            font-family: Arial, "Arial Black", "微软雅黑", "宋体";
             border-style: solid;
             height: 700px;
         }
-        a:hover{
+
+        a:hover {
             cursor: pointer;
         }
     </style>
     <script>
-        $(function (){
+        $(function () {
             $(".roleName").click(function () {
                 var roleid = $(this).attr("roleID");
                 $("#hidden_rid").val(roleid);
                 $("input:checked").each(function (i) {
-                    $(this).prop("checked",false);
+                    $(this).prop("checked", false);
                 });
                 $(".function_check").each(function () {
                     var checkbox = $(this);
-                    var functionid=$(this).attr("functionid");
+                    var functionid = $(this).attr("functionid");
                     $.ajax({
                         url: 'isExistFunction',
                         type: 'POST',
-                        data:{rid:roleid,fid:functionid},
+                        data: {rid: roleid, fid: functionid},
                         dataType: 'html',
-                        success:function (data) {
-                            if(data=="success"){
-                                checkbox.prop("checked",true);
-                            }else{
-                                checkbox.prop("checked",false);
+                        success: function (data) {
+                            if (data == "success") {
+                                checkbox.prop("checked", true);
+                            } else {
+                                checkbox.prop("checked", false);
                             }
                         }
                     })
                 });
             });
 
-            $("#save").click(function (){
-                if(!confirm("是否要修改？")){
-                    return false
-                }else{
-              var roleid=$("#hidden_rid").val();
-              var mdata=roleid;
-              if(roleid==null){
-                  alert("请选择角色！");
-                  return false;
-              }else{
-                $(".function_check:checked").each(function () {
-                    var checkbox=$(this);
-                    mdata=mdata+"-"+checkbox.attr("functionid");
-                });
-              }
-                console.log(mdata);
-              $.ajax({
-                  url: 'modify_function',
-                  type: 'POST',
-                  data:{mdata:mdata},
-                  dataType: 'html',
-                  success:function (data){
-                      alert(data.value());
-                  }
-              });
+            $("#save").click(function () {
+                if (confirm("是否要修改？")) {
+                    var roleid = $("#hidden_rid").val();
+                    var mdata = roleid;
+                    if (roleid == null) {
+                        alert("请选择角色！");
+                        return false;
+                    } else {
+                        $(".function_check:checked").each(function () {
+                            var checkbox = $(this);
+                            mdata = mdata + "-" + checkbox.attr("functionid");
+                        });
+                    }
+                    console.log(mdata);
+                    $.ajax({
+                        url: 'modify_function',
+                        type: 'POST',
+                        data: {mdata: mdata},
+                        dataType: 'text',
+                        success: function (data) {
+                            alert(data);
+                        }
+                    });
                 }
+
+            });
+
+            $("#selectall").click(function () {//全选
+                $(".function_check").prop("checked", true)
+            });
+
+            $("#unselectall").click(function () {//全不选
+                $(".function_check").prop("checked", false);
             });
 
         });
@@ -145,7 +153,7 @@
 
         </td>
         <td width="16" valign="top" background="./Images/mail_right_bg.gif"><img src="./Images/nav_right_bg.gif"
-                                                                                 width="16" height="29"/></td>
+                                                                                 width="20" height="29"/></td>
     </tr>
     <!-- 中间部分开始 -->
     <tr>
@@ -190,14 +198,18 @@
     <div id="role">
         <div class="title">角色列表</div>
         <div class="roles">
-            <div class="role_select" th:each="role : ${roles}" >
+            <div class="role_select" th:each="role : ${roles}">
                 <a th:attr="roleID=${role.id}" th:text="${role.rolename}" class="roleName"></a>
                 <input type="hidden" id="hidden_rid">
             </div>
         </div>
     </div>
     <div id="function">
-        <div class="title">权限列表&nbsp;&nbsp;&nbsp;&nbsp;<button style="height: 15px;font-size: 5px;" id="save">保存</button></div>
+        <div class="title">权限列表&nbsp;&nbsp;&nbsp;&nbsp;<button style="height: 17px;font-size: 5px;width: 70px;text-align: center;vertical-align: center;" id="save">保存
+        </button>
+            <input type="radio" name="select" id="selectall">全选
+            <input type="radio" name="select" id="unselectall">全不选
+        </div>
         <div class="functions">
             <div class="function_select" th:each="function : ${functions}">
                 <input type="checkbox" class="function_check" name="fcheck" th:attr="functionid=${function.id}">
